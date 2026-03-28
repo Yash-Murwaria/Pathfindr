@@ -1,11 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<<<<<<< HEAD
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Student AI Mentor</title>
+<title>Pathfindr - Your Student Buddy</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- Font Awesome for Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 <style>
     :root {
         --primary-orange: #FF8C00; /* Dark Orange */
@@ -19,94 +15,36 @@
 
     body {
         background-color: var(--bg-cream);
+        background-image: 
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath d='M10,10 L20,20 M80,80 L90,90 M10,90 L20,80 M80,10 L90,20' stroke='%23FFD54F' stroke-width='2'/%3E%3Ccircle cx='50' cy='50' r='2' fill='%23FFD54F'/%3E%3Cpath d='M30,30 Q50,10 70,30' fill='none' stroke='%23FFD54F' stroke-width='1'/%3E%3Cpath d='M20,60 L30,70 L40,60' fill='none' stroke='%23FFD54F' stroke-width='1'/%3E%3C/svg%3E");
+        background-size: 150px 150px;
         display: flex;
         justify-content: center;
         align-items: center;
         height: 100vh;
         overflow: hidden;
+        position: relative;
     }
 
-    /* Mode Selection Overlay */
-    #mode-overlay {
+    /* Background floating doodles - Synchronized with other files */
+    body::after {
+        content: '📚 ✍️ 🔬 📐 💻 🧪 🌍 🔢';
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(255, 248, 240, 0.95);
+        font-size: 3rem;
+        color: rgba(255, 143, 0, 0.08);
         display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-        transition: opacity 0.5s ease, visibility 0.5s;
-    }
-
-    .overlay-content {
-        text-align: center;
-        animation: fadeInDown 0.8s ease-out;
-    }
-
-    .overlay-content h1 {
-        color: var(--primary-orange);
-        margin-bottom: 30px;
-        font-size: 2rem;
-        font-weight: 700;
-    }
-
-    .mode-options {
-        display: flex;
-        gap: 30px;
-        perspective: 1000px;
-    }
-
-    .mode-card {
-        background: var(--white);
-        width: 200px;
-        padding: 40px 20px;
-        border-radius: 25px;
-        box-shadow: 0 15px 35px rgba(255, 140, 0, 0.1);
-        cursor: pointer;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 20px;
-        border: 2px solid transparent;
-    }
-
-    .mode-card:hover {
-        transform: translateY(-15px) rotateX(10deg);
-        border-color: var(--primary-orange);
-        box-shadow: 0 20px 45px rgba(255, 140, 0, 0.2);
-    }
-
-    .mode-icon {
-        font-size: 3.5rem;
-        background: #FFF0E0;
-        width: 100px;
-        height: 100px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        transition: transform 0.3s ease;
-    }
-
-    .mode-card:hover .mode-icon {
-        transform: scale(1.1) rotate(5deg);
-    }
-
-    .mode-card h3 {
-        color: var(--text-dark);
-        font-size: 1.2rem;
-        font-weight: 600;
-    }
-
-    .mode-card p {
-        font-size: 0.85rem;
-        color: #777;
-        line-height: 1.4;
+        flex-wrap: wrap;
+        gap: 120px;
+        justify-content: space-around;
+        pointer-events: none;
+        z-index: -1;
+        padding: 50px;
+        line-height: 250px;
+        overflow: hidden;
     }
 
     @keyframes fadeInDown {
@@ -116,19 +54,22 @@
 
     .chat-container {
         width: 100%;
-        max-width: 500px;
-        height: 85vh;
+        max-width: 600px;
+        height: 90vh;
         background: var(--white);
-        border-radius: 20px;
-        box-shadow: 0 10px 25px rgba(255, 140, 0, 0.15);
+        border-radius: 30px;
+        box-shadow: 0 20px 50px rgba(255, 140, 0, 0.2);
         display: flex;
         flex-direction: column;
         overflow: hidden;
-        border: 1px solid var(--light-orange);
-        opacity: 0;
-        transform: scale(0.95);
-        transition: all 0.5s ease;
-        visibility: hidden;
+        border: 3px solid var(--light-orange);
+        border-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Cpath d='M2,2 L48,2 L48,48 L2,48 Z' fill='none' stroke='%23FFB347' stroke-width='4' stroke-dasharray='10,5'/%3E%3C/svg%3E") 10;
+        position: relative;
+        overflow: visible;
+        opacity: 1;
+        transform: scale(1);
+        transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        visibility: visible;
     }
 
     .chat-container.visible {
@@ -137,143 +78,171 @@
         visibility: visible;
     }
 
+    /* Floating Doodles */
+    .doodle-item {
+        position: absolute;
+        color: var(--light-orange);
+        font-size: 2.2rem;
+        opacity: 0.6;
+        pointer-events: none;
+        z-index: 5;
+        animation: float 4s ease-in-out infinite;
+        transition: all 0.3s ease;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-25px) rotate(15deg); }
+    }
+
+    .top-left { top: -35px; left: -35px; }
+    .top-right { top: -35px; right: -35px; animation-delay: 0.5s; }
+    .bottom-left { bottom: -35px; left: -35px; animation-delay: 1s; }
+    .bottom-right { bottom: -35px; right: -35px; animation-delay: 1.5s; }
+    .mid-left { top: 50%; left: -50px; animation-delay: 2s; }
+    .mid-right { top: 50%; right: -50px; animation-delay: 2.5s; }
+
     /* Header */
     .chat-header {
         background: linear-gradient(135deg, var(--light-orange), var(--primary-orange));
-        padding: 20px;
+        padding: 25px;
         color: white;
         text-align: center;
+        border-bottom: 2px solid rgba(255,255,255,0.2);
     }
 
-    .chat-header h2 { font-size: 1.2rem; font-weight: 600; }
-    .chat-header p { font-size: 0.8rem; opacity: 0.9; }
+    .chat-header h2 { font-size: 1.5rem; font-weight: 700; letter-spacing: 0.5px; }
+    .chat-header p { font-size: 0.9rem; opacity: 0.9; margin-top: 5px; }
 
     /* Messages Area */
     #chat-box {
         flex: 1;
-        padding: 20px;
+        padding: 25px;
         overflow-y: auto;
         display: flex;
         flex-direction: column;
-        gap: 15px;
-        background-image: radial-gradient(var(--light-orange) 0.5px, transparent 0.5px);
-        background-size: 20px 20px;
+        gap: 20px;
+        background-image: radial-gradient(var(--light-orange) 0.8px, transparent 0.8px);
+        background-size: 25px 25px;
         background-color: #fffdfa;
+        scroll-behavior: smooth;
     }
 
     .message {
-        max-width: 80%;
-        padding: 12px 16px;
-        border-radius: 15px;
-        font-size: 0.95rem;
-        line-height: 1.5;
+        max-width: 85%;
+        padding: 14px 20px;
+        border-radius: 20px;
+        font-size: 1rem;
+        line-height: 1.6;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        animation: messageSlide 0.3s ease-out;
     }
 
-    .ai-message {
+    @keyframes messageSlide {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .buddy-message {
         align-self: flex-start;
-        background: #f0f0f0;
+        background: #f8f8f8;
         color: var(--text-dark);
-        border-bottom-left-radius: 2px;
+        border-bottom-left-radius: 4px;
+        border: 1px solid #eee;
+    }
+
+    /* Thinking Dots Animation */
+    .thinking {
+        display: flex;
+        gap: 4px;
+        padding: 10px 15px;
+    }
+
+    .thinking .dot {
+        width: 6px;
+        height: 6px;
+        background: #999;
+        border-radius: 50%;
+        animation: dotPulse 1.4s infinite ease-in-out;
+    }
+
+    .thinking .dot:nth-child(2) { animation-delay: 0.2s; }
+    .thinking .dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes dotPulse {
+        0%, 80%, 100% { transform: scale(0); opacity: 0.3; }
+        40% { transform: scale(1); opacity: 1; }
     }
 
     .user-message {
         align-self: flex-end;
-        background: var(--primary-orange);
+        background: linear-gradient(135deg, var(--light-orange), var(--primary-orange));
         color: white;
-        border-bottom-right-radius: 2px;
+        border-bottom-right-radius: 4px;
+        box-shadow: 0 6px 15px rgba(255, 140, 0, 0.2);
     }
 
     /* Input Area */
     .input-area {
-        padding: 15px;
+        padding: 20px;
         background: white;
         border-top: 1px solid #eee;
         display: flex;
-        gap: 10px;
+        gap: 15px;
         align-items: center;
-    }
-
-    .mic-btn {
-        background: #f0f0f0;
-        color: var(--primary-orange);
-        border: none;
-        width: 45px;
-        height: 45px;
-        border-radius: 50%;
-        cursor: pointer;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.2rem;
-        transition: 0.3s;
-    }
-
-    .mic-btn:hover {
-        background: #e0e0e0;
-        transform: scale(1.1);
-    }
-
-    .mic-btn.active {
-        display: flex;
     }
 
     input {
         flex: 1;
-        padding: 12px;
-        border: 1.5px solid #eee;
-        border-radius: 10px;
+        padding: 15px 20px;
+        border: 2px solid #f0f0f0;
+        border-radius: 15px;
         outline: none;
-        transition: 0.3s;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #fafafa;
     }
 
-    input:focus { border-color: var(--primary-orange); }
+    input:focus { 
+        border-color: var(--primary-orange); 
+        background: white;
+        box-shadow: 0 0 0 4px rgba(255, 140, 0, 0.1);
+    }
 
-    button {
+    button.send-btn {
         background: var(--primary-orange);
         color: white;
         border: none;
-        padding: 10px 20px;
-        border-radius: 10px;
+        padding: 12px 25px;
+        border-radius: 15px;
         cursor: pointer;
-        font-weight: 600;
-        transition: 0.3s;
+        font-weight: 700;
+        font-size: 1rem;
+        transition: all 0.3s;
+        box-shadow: 0 4px 10px rgba(255, 140, 0, 0.3);
     }
 
-    button:hover { background: var(--light-orange); }
+    button.send-btn:hover { 
+        background: var(--light-orange);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(255, 140, 0, 0.4);
+    }
 </style>
-=======
-  <meta charset="UTF-8" />
-  <!-- This makes the site look correct on mobile phones -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pathfindr</title>
-  <!-- Link to our shared stylesheet -->
-  <link rel="stylesheet" href="style.css" />
->>>>>>> e48ba93091c9cee34e8c8650c3b96e7125f4fb4f
 </head>
 <body>
 
-<div id="mode-overlay">
-    <div class="overlay-content">
-        <h1>How would you like to learn?</h1>
-        <div class="mode-options">
-            <div class="mode-card" onclick="selectMode('text')">
-                <div class="mode-icon">💬</div>
-                <h3>Text with AI</h3>
-                <p>Chat naturally through messages and get instant help.</p>
-            </div>
-            <div class="mode-card" onclick="selectMode('talk')">
-                <div class="mode-icon">🎙️</div>
-                <h3>Talk with AI</h3>
-                <p>Use your voice to interact and listen to explanations.</p>
-            </div>
-        </div>
-    </div>
-</div>
-
 <div class="chat-container">
+    <!-- Floating Doodles -->
+    <div class="doodle-item top-left"><i class="fas fa-pencil-alt"></i></div>
+    <div class="doodle-item top-right"><i class="fas fa-lightbulb"></i></div>
+    <div class="doodle-item bottom-left"><i class="fas fa-graduation-cap"></i></div>
+    <div class="doodle-item bottom-right"><i class="fas fa-rocket"></i></div>
+    <div class="doodle-item mid-left"><i class="fas fa-star"></i></div>
+    <div class="doodle-item mid-right"><i class="fas fa-heart"></i></div>
+
     <div class="chat-header">
-        <h2>Academic AI Assistant</h2>
-        <p>Formal • Polite • Insightful</p>
+        <h2>Talk with me</h2>
+        <p>Your Buddy • Friendly • Helpful</p>
     </div>
 
     <div id="chat-box">
@@ -281,63 +250,83 @@
     </div>
 
     <div class="input-area">
-        <button id="mic-btn" class="mic-btn" onclick="toggleMic()">🎙️</button>
-        <input type="text" id="userInput" placeholder="Type your academic query here..." onkeypress="handleKey(event)">
-        <button onclick="sendMessage()">Send</button>
+        <input type="text" id="userInput" placeholder="Type your message..." onkeypress="handleKey(event)">
+        <button class="send-btn" onclick="sendMessage()">Send</button>
     </div>
 </div>
 
 <script>
     const chatBox = document.getElementById('chat-box');
     const userInput = document.getElementById('userInput');
-    const modeOverlay = document.getElementById('mode-overlay');
     const chatContainer = document.querySelector('.chat-container');
-    const micBtn = document.getElementById('mic-btn');
 
-    let currentMode = 'text';
-
-    function selectMode(mode) {
-        currentMode = mode;
-        
-        // Hide overlay
-        modeOverlay.style.opacity = '0';
-        modeOverlay.style.visibility = 'hidden';
-        
-        // Show chat
-        chatContainer.classList.add('visible');
-
-        // Initial response based on mode
-        if (mode === 'talk') {
-            micBtn.classList.add('active');
-            userInput.placeholder = "Say something to your AI mentor...";
-            appendMessage("Voice mode activated. I'm listening. How can I help you today?", 'ai-message');
-        } else {
-            micBtn.classList.remove('active');
-            userInput.placeholder = "Type your academic query here...";
-            appendMessage("Text mode activated. How may I assist you with your studies?", 'ai-message');
-        }
-    }
-
-    function toggleMic() {
-        // Voice recognition simulation
-        const btn = document.getElementById('mic-btn');
-        btn.classList.toggle('active-mic');
-        
-        if (btn.classList.contains('active-mic')) {
-            btn.style.background = '#FF8C00';
-            btn.style.color = '#fff';
-            btn.innerText = '🔴';
-            userInput.placeholder = "Listening...";
-        } else {
-            btn.style.background = '#f0f0f0';
-            btn.style.color = '#FF8C00';
-            btn.innerText = '🎙️';
-            userInput.placeholder = currentMode === 'talk' ? "Say something..." : "Type something...";
-        }
-    }
+    // Initial greeting
+    appendMessage("Hey! I'm your student buddy. What should we explore today?", 'buddy-message');
 
     function handleKey(e) {
         if (e.key === 'Enter') sendMessage();
+    }
+
+    function getBuddyResponse(input) {
+        const lowInput = input.toLowerCase();
+        
+        // 1. Required System Commands
+        if (lowInput === "help" || lowInput === "commands") {
+            return "I'm here to help! You can ask me about 'marks', 'quiz', 'explore', 'science', 'maths', or even for 'study tips'. What do you need?";
+        }
+
+        if (lowInput.includes("marks") || lowInput.includes("score")) {
+            return "You can enter your Class 10 scores on our Marks page to build your academic profile. Ready to do that now?";
+        }
+        
+        if (lowInput.includes("quiz") || lowInput.includes("test")) {
+            return "Our Personality Quiz helps us understand your interests better. It's the best way to find a career you'll love!";
+        }
+
+        if (lowInput.includes("explore") || lowInput.includes("roadmap") || lowInput.includes("atlas")) {
+            return "The Career Atlas is where the magic happens! You can explore different streams and see where they lead.";
+        }
+
+        // 2. Academic & Study Commands
+        if (lowInput.includes("syllabus") || lowInput.includes("subjects")) {
+            return "For Class 10, the core subjects are English, Hindi, Maths, Science, and Social Science. Which one should we talk about?";
+        }
+
+        if (lowInput.includes("tips") || lowInput.includes("study")) {
+            return "Here's a pro tip: Break your study sessions into 25-minute chunks with 5-minute breaks. It's called the Pomodoro technique! Want more tips?";
+        }
+
+        if (lowInput.includes("science")) {
+            return "Science is fascinating! From atoms to galaxies, there's so much to explore. Are you interested in Physics, Chemistry, or Biology?";
+        }
+
+        if (lowInput.includes("math") || lowInput.includes("algebra") || lowInput.includes("geometry")) {
+            return "Maths is the language of the universe! Whether it's Algebra or Geometry, it's all about problem-solving. Need help with a specific topic?";
+        }
+
+        if (lowInput.includes("career") || lowInput.includes("job") || lowInput.includes("future")) {
+            return "Choosing a career is a big step! We can look at your marks and interests to find the best path. Have you checked the Explore page yet?";
+        }
+
+        if (lowInput.includes("who are you") || lowInput.includes("buddy")) {
+            return "I'm your Student Buddy! I'm here to help you navigate your academic journey and find the best career path for you.";
+        }
+
+        // 3. Conversational Patterns
+        if (lowInput.includes("hi") || lowInput.includes("hello") || lowInput.includes("hey")) {
+            return "Hey there! How can I help you today?";
+        }
+        
+        if (lowInput.includes("thank")) {
+            return "You're very welcome! Happy to help!";
+        }
+
+        // 4. Fallbacks
+        if (lowInput.length < 5) {
+            return "I'm listening! Tell me more about that.";
+        }
+
+        return "That's interesting! Tell me more about that.";
     }
 
     function sendMessage() {
@@ -348,11 +337,23 @@
         appendMessage(text, 'user-message');
         userInput.value = '';
 
-        // AI Response (Formal/Polite Simulation)
+        // Show "Thinking..." status
+        const thinkingId = "thinking-" + Date.now();
+        const thinkingDiv = document.createElement('div');
+        thinkingDiv.id = thinkingId;
+        thinkingDiv.className = 'message buddy-message thinking';
+        thinkingDiv.innerHTML = '<span class="dot"></span><span class="dot"></span><span class="dot"></span>';
+        chatBox.appendChild(thinkingDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+
         setTimeout(() => {
-            const aiResponse = "I have received your query. Please allow me a moment to provide a detailed and formal explanation regarding this topic.";
-            appendMessage(aiResponse, 'ai-message');
-        }, 800);
+            // Remove "Thinking..." status
+            const thinkingElement = document.getElementById(thinkingId);
+            if (thinkingElement) thinkingElement.remove();
+
+            const buddyResponse = getBuddyResponse(text);
+            appendMessage(buddyResponse, 'buddy-message');
+        }, 1000);
     }
 
     function appendMessage(text, className) {

@@ -342,7 +342,7 @@
     <ul class="nav-links">
       <li><a href="#features">Features</a></li>
       <li><a href="#how">How it works</a></li>
-      <li><a href="#cta">Pricing</a></li>
+      <li><a href="chat.html">Talk with me</a></li>
       <li><a href="#cta" class="nav-cta">Get Started</a></li>
     </ul>
   </nav>
@@ -366,6 +366,7 @@
     <p class="hero-sub">Discover the clearest route to your goals. Smart navigation for life, career, and beyond — powered by real insight.</p>
     <div class="hero-actions">
       <a href="#cta" class="btn-primary">Start Exploring →</a>
+      <a href="chat.html" class="btn-ghost">Talk with me</a>
       <a href="#how" class="btn-ghost">See how it works</a>
     </div>
     <div class="scroll-hint">
@@ -418,6 +419,9 @@
         <input class="email-input" type="email" placeholder="your@email.com" id="emailInput"/>
         <button class="btn-primary" onclick="handleSignup()">Get Started</button>
       </div>
+      <p style="margin-top: 1.5rem; color: rgba(255,248,238,0.5); font-size: 0.9rem;">
+        Or <a href="chat.html" style="color: var(--amber); text-decoration: none; font-weight: 600;">Talk with me</a> directly for instant help.
+      </p>
       <p id="signupMsg" style="margin-top:1rem;font-size:0.82rem;color:var(--amber);min-height:1.2em;"></p>
     </div>
   </section>
@@ -481,8 +485,11 @@
       const msg = document.getElementById('signupMsg');
       if (!val || !val.includes('@')) { msg.style.color = '#ff4444'; msg.textContent = 'Please enter a valid email address.'; return; }
       msg.style.color = 'var(--amber)';
-      msg.textContent = "🎉 You're on the list! We'll be in touch soon.";
-      document.getElementById('emailInput').value = '';
+      msg.textContent = "🎉 Welcome aboard! Navigating to your career roadmap...";
+      
+      setTimeout(() => {
+        window.location.href = 'explore.html';
+      }, 1200);
     }
 
     document.getElementById('emailInput').addEventListener('keydown', e => { if (e.key === 'Enter') handleSignup(); });

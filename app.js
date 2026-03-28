@@ -1,6 +1,5 @@
 // Pathfindr — Main JavaScript File
-// This file controls all logic: marks, quiz, Claude API calls, and results.
-<<<<<<< HEAD
+// This file handles data collection for the student profile.
 
 document.addEventListener('DOMContentLoaded', () => {
   const marksForm = document.getElementById('marksForm');
@@ -31,17 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
       setTimeout(() => {
         btn.innerHTML = originalText;
         btn.style.background = '';
-        alert('Your profile has been saved successfully!');
+        window.location.href = 'quiz.html'; // Navigate to next page
       }, 1500);
     });
   }
 });
-=======
-// i am adding some lines in it to test the commit and push functionality of git
-
-// Global variables
-let marks = [];
-let quizData = [];
-let currentQuestionIndex = 0;
-let userAnswers = [];
->>>>>>> origin/ayushi-work
