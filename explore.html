@@ -1,18 +1,944 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <!-- This makes the site look correct on mobile phones -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>StreamSense</title>
-  <!-- Link to our shared stylesheet -->
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pathfindr — Career Atlas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Crimson+Pro:wght@400;600&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* ── CSS Variables — the full parchment palette ── */
+    :root {
+      --parch-light:   #F7EDD4;
+      --parch-mid:     #EDD49A;
+      --parch-warm:    #D4A843;
+      --parch-deep:    #B8842A;
+      --parch-darker:  #8B5E1A;
+      --ink:           #2A1400;
+      --ink-soft:      #5C3410;
+      --ink-faint:     rgba(60,25,0,0.45);
+
+      --sci-bg:        #1A2E4A;
+      --sci-border:    #7BA7D4;
+      --sci-glow:      rgba(123,167,212,0.18);
+      --arts-bg:       #2A1840;
+      --arts-border:   #9B7BC4;
+      --arts-glow:     rgba(155,123,196,0.18);
+      --com-bg:        #0F2E1A;
+      --com-border:    #5BAA7A;
+      --com-glow:      rgba(91,170,122,0.18);
+
+      --connector:     rgba(139,94,26,0.45);
+      --radius-node:   14px;
+      --radius-leaf:   10px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      min-height: 100vh;
+      background-color: #EDD49A;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.07'/%3E%3C/svg%3E"),
+        radial-gradient(ellipse at 50% 0%, #F7EDD4 0%, #EDD49A 40%, #D4A843 75%, #B8842A 100%);
+      font-family: 'Crimson Pro', serif;
+      color: var(--ink);
+      padding-bottom: 80px;
+    }
+
+    /* ── NAV ── */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 32px;
+      background: rgba(237,212,154,0.78);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(139,80,10,0.25);
+    }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      color: var(--ink);
+      letter-spacing: 0.5px;
+    }
+    .nav-logo span { color: var(--parch-darker); }
+    .nav-sub {
+      font-size: 0.78rem;
+      color: var(--ink-faint);
+      font-style: italic;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── PAGE WRAPPER ── */
+    .page {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 48px 24px 0;
+    }
+
+    /* ── HEADER ── */
+    .atlas-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .atlas-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      color: var(--ink);
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .atlas-header p {
+      font-size: 0.9rem;
+      color: var(--ink-faint);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    .ornament {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin: 14px 0;
+    }
+    .ornament-line {
+      width: 80px; height: 1px;
+      background: linear-gradient(to right, transparent, var(--parch-deep));
+    }
+    .ornament-line.r {
+      background: linear-gradient(to left, transparent, var(--parch-deep));
+    }
+    .ornament-diamond {
+      width: 7px; height: 7px;
+      background: var(--parch-deep);
+      transform: rotate(45deg);
+    }
+
+    /* ── FLOWCHART CONTAINER ── */
+    .flowchart {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ── CONNECTOR LINE (simple vertical) ── */
+    .connector {
+      width: 2px;
+      height: 32px;
+      background: var(--connector);
+      flex-shrink: 0;
+    }
+
+    /* ── T-FAN: the horizontal bar that fans to 3 streams ── */
+    .connector-fan {
+      position: relative;
+      height: 48px;
+      width: 100%;
+      max-width: 700px;
+      flex-shrink: 0;
+    }
+    /* vertical stem going down */
+    .connector-fan::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 2px; height: 100%;
+      background: var(--connector);
+    }
+    /* horizontal crossbar at the bottom */
+    .connector-fan::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 10%;
+      width: 80%; height: 2px;
+      background: var(--connector);
+    }
+
+    /* Short drops from crossbar down to each stream node */
+    .stream-drops {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 700px;
+    }
+    .stream-drop {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 33.33%;
+    }
+    .stream-drop-line {
+      width: 2px;
+      height: 24px;
+      background: var(--connector);
+    }
+
+    /* ── ROOT NODE ── */
+    .root-node {
+      background: linear-gradient(135deg, var(--parch-deep) 0%, var(--parch-darker) 100%);
+      border: 2px solid var(--parch-warm);
+      border-radius: var(--radius-node);
+      padding: 18px 40px;
+      text-align: center;
+      box-shadow: 0 6px 28px rgba(80,30,0,0.28), inset 0 1px 0 rgba(255,220,120,0.3);
+    }
+    .root-node h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.35rem;
+      color: var(--parch-light);
+      letter-spacing: 2px;
+    }
+    .root-node p {
+      font-size: 0.78rem;
+      color: rgba(247,237,212,0.55);
+      letter-spacing: 1px;
+      margin-top: 3px;
+      text-transform: uppercase;
+    }
+
+    /* ── STREAM ROW ── */
+    .stream-row {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      width: 100%;
+      max-width: 700px;
+    }
+
+    /* ── STREAM NODE ── */
+    .stream-node {
+      flex: 1;
+      max-width: 210px;
+      border-radius: var(--radius-node);
+      padding: 16px 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      user-select: none;
+    }
+    .stream-node:hover { transform: translateY(-3px); }
+
+    .stream-node.science {
+      background: var(--sci-bg);
+      border: 2px solid var(--sci-border);
+      box-shadow: 0 4px 20px rgba(27,46,74,0.5);
+    }
+    .stream-node.arts {
+      background: var(--arts-bg);
+      border: 2px solid var(--arts-border);
+      box-shadow: 0 4px 20px rgba(42,24,64,0.5);
+    }
+    .stream-node.commerce {
+      background: var(--com-bg);
+      border: 2px solid var(--com-border);
+      box-shadow: 0 4px 20px rgba(15,46,26,0.5);
+    }
+    .stream-node.open.science  { box-shadow: 0 8px 32px rgba(27,46,74,0.6),  0 0 20px var(--sci-glow); }
+    .stream-node.open.arts     { box-shadow: 0 8px 32px rgba(42,24,64,0.6),  0 0 20px var(--arts-glow); }
+    .stream-node.open.commerce { box-shadow: 0 8px 32px rgba(15,46,26,0.6),  0 0 20px var(--com-glow); }
+
+    .stream-emoji { font-size: 1.5rem; display: block; margin-bottom: 5px; }
+
+    .stream-node h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      letter-spacing: 1px;
+    }
+    .stream-node.science  h3 { color: #A8C8E8; }
+    .stream-node.arts     h3 { color: #C4A8E0; }
+    .stream-node.commerce h3 { color: #8ECFAA; }
+
+    .stream-node p {
+      font-size: 0.72rem;
+      margin-top: 3px;
+      opacity: 0.55;
+    }
+    .stream-node.science  p { color: #A8C8E8; }
+    .stream-node.arts     p { color: #C4A8E0; }
+    .stream-node.commerce p { color: #8ECFAA; }
+
+    /* chevron arrow that rotates when panel opens */
+    .stream-chevron {
+      display: block;
+      margin: 6px auto 0;
+      width: 14px; height: 14px;
+      transition: transform 0.3s ease;
+    }
+    .stream-node.open .stream-chevron { transform: rotate(180deg); }
+    .stream-node.science  .stream-chevron { color: var(--sci-border); }
+    .stream-node.arts     .stream-chevron { color: var(--arts-border); }
+    .stream-node.commerce .stream-chevron { color: var(--com-border); }
+
+    /* ── CAREERS PANEL — expands below the stream row ── */
+    .careers-panel {
+      width: 100%;
+      max-width: 700px;
+      max-height: 0;           /* collapsed by default */
+      overflow: hidden;
+      transition: max-height 0.5s cubic-bezier(0.4,0,0.2,1),
+                  opacity    0.4s ease,
+                  margin     0.4s ease;
+      opacity: 0;
+      margin-top: 0;
+    }
+    .careers-panel.open {
+      max-height: 1200px;      /* large enough for all 6 cards */
+      opacity: 1;
+    }
+
+    /* The bordered container that visually "hangs" below the stream row */
+    .careers-inner {
+      padding: 4px 0 8px;
+      border-left:   2px solid var(--connector);
+      border-right:  2px solid var(--connector);
+      border-bottom: 2px solid var(--connector);
+      border-radius: 0 0 16px 16px;
+    }
+    /* Small vertical line at the top of the inner box */
+    .careers-inner::before {
+      content: '';
+      display: block;
+      height: 20px;
+      border-left: 2px solid var(--connector);
+      width: 1px;
+      margin: 0 auto;
+    }
+
+    .careers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 12px;
+      padding: 0 16px 16px;
+    }
+
+    /* ── CAREER CARD ── */
+    .career-card {
+      border-radius: var(--radius-leaf);
+      padding: 14px 16px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      /* starts invisible; JS adds .revealed to animate in */
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.35s ease, transform 0.35s ease,
+                  box-shadow 0.2s ease;
+    }
+    /* shimmer sweep on hover */
+    .career-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -60%;
+      width: 40%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,220,120,0.08), transparent);
+      transition: left 0.5s ease;
+    }
+    .career-card:hover::before { left: 120%; }
+    .career-card:hover { transform: translateY(-2px) !important; }
+
+    .career-card.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .career-card.science {
+      background: rgba(26,46,74,0.85);
+      border: 1px solid rgba(123,167,212,0.35);
+      box-shadow: 0 3px 14px rgba(10,20,40,0.35);
+    }
+    .career-card.science:hover {
+      box-shadow: 0 6px 22px rgba(10,20,40,0.5), 0 0 12px rgba(123,167,212,0.2);
+    }
+    .career-card.arts {
+      background: rgba(42,24,64,0.85);
+      border: 1px solid rgba(155,123,196,0.35);
+      box-shadow: 0 3px 14px rgba(20,10,40,0.35);
+    }
+    .career-card.arts:hover {
+      box-shadow: 0 6px 22px rgba(20,10,40,0.5), 0 0 12px rgba(155,123,196,0.2);
+    }
+    .career-card.commerce {
+      background: rgba(15,46,26,0.85);
+      border: 1px solid rgba(91,170,122,0.35);
+      box-shadow: 0 3px 14px rgba(5,20,10,0.35);
+    }
+    .career-card.commerce:hover {
+      box-shadow: 0 6px 22px rgba(5,20,10,0.5), 0 0 12px rgba(91,170,122,0.2);
+    }
+
+    .career-emoji { font-size: 1.25rem; display: block; margin-bottom: 6px; }
+
+    .career-card h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.92rem;
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+    .career-card.science  h4 { color: #C8DFF4; }
+    .career-card.arts     h4 { color: #D8C8F0; }
+    .career-card.commerce h4 { color: #B0E4C4; }
+
+    .career-salary {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #72E296;
+      margin-bottom: 2px;
+    }
+    .career-hint {
+      font-size: 0.7rem;
+      opacity: 0.5;
+      line-height: 1.4;
+    }
+    .career-card.science  .career-hint { color: #A8C8E8; }
+    .career-card.arts     .career-hint { color: #C4A8E0; }
+    .career-card.commerce .career-hint { color: #8ECFAA; }
+
+    /* ── DETAIL MODAL ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(40,15,0,0.6);
+      z-index: 300;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    @media (min-width: 640px) {
+      .modal-overlay { align-items: center; }
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal {
+      background: linear-gradient(160deg, #3D1F00 0%, #221000 100%);
+      border: 1px solid rgba(210,150,50,0.5);
+      border-radius: 24px 24px 0 0;
+      width: 100%;
+      max-width: 560px;
+      padding: 24px 24px 40px;
+      max-height: 82vh;
+      overflow-y: auto;
+      transform: translateY(40px);
+      transition: transform 0.4s cubic-bezier(0.34,1.4,0.64,1);
+    }
+    @media (min-width: 640px) {
+      .modal {
+        border-radius: 20px;
+        transform: translateY(20px) scale(0.97);
+        margin: 16px;
+      }
+    }
+    .modal-overlay.active .modal {
+      transform: translateY(0) scale(1);
+    }
+
+    .modal-handle {
+      width: 40px; height: 4px;
+      background: rgba(210,160,60,0.3);
+      border-radius: 2px;
+      margin: 0 auto 20px;
+    }
+    @media (min-width: 640px) { .modal-handle { display: none; } }
+
+    .modal-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      color: #FFE0A0;
+      margin-bottom: 5px;
+    }
+    .modal-badge {
+      display: inline-block;
+      border: 1px solid rgba(210,160,60,0.4);
+      background: rgba(210,150,40,0.12);
+      color: var(--parch-warm);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      padding: 3px 12px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+    .modal-section {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 1.8px;
+      color: rgba(200,150,60,0.5);
+      margin-bottom: 8px;
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 18px;
+    }
+    .chip {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(210,160,60,0.2);
+      color: rgba(255,235,185,0.82);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+    }
+    .modal-salary {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #72E296;
+      margin-bottom: 14px;
+    }
+    .modal-suited {
+      background: rgba(210,150,40,0.08);
+      border-left: 3px solid rgba(210,150,40,0.5);
+      border-radius: 0 10px 10px 0;
+      padding: 12px 15px;
+      color: rgba(255,230,175,0.75);
+      font-size: 0.88rem;
+      line-height: 1.7;
+      margin-bottom: 22px;
+      font-style: italic;
+    }
+    .modal-close {
+      width: 100%;
+      padding: 13px;
+      background: rgba(210,150,40,0.1);
+      border: 1px solid rgba(210,150,40,0.25);
+      border-radius: 12px;
+      color: var(--parch-warm);
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .modal-close:hover { background: rgba(210,150,40,0.2); }
+
+    /* ── CONTINUE BUTTON ── */
+    .continue-btn {
+      position: fixed;
+      bottom: 22px; right: 22px;
+      background: linear-gradient(135deg, #8B4513, #6B2F0A);
+      color: #FFE0A0;
+      border: 1px solid rgba(210,160,60,0.4);
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-size: 0.88rem;
+      font-family: 'Crimson Pro', serif;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 18px rgba(80,30,0,0.4);
+      z-index: 100;
+      transition: transform 0.2s, box-shadow 0.2s;
+      letter-spacing: 0.5px;
+    }
+    .continue-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 26px rgba(80,30,0,0.5);
+    }
+
+    /* ── FOOTER HINT ── */
+    .scroll-hint {
+      text-align: center;
+      margin-top: 48px;
+      font-size: 0.75rem;
+      color: var(--ink-faint);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    .scroll-hint span {
+      display: block;
+      margin-top: 6px;
+      font-size: 1rem;
+      opacity: 0.4;
+    }
+  </style>
 </head>
 <body>
 
-  <h1>Explore Carrers</h1>
+  <nav class="nav">
+    <div class="nav-logo">Path<span>findr</span></div>
+    <div class="nav-sub">India · Class X Career Atlas</div>
+  </nav>
 
-  <!-- Link to our shared JavaScript file -->
-  <script src="app.js"></script>
+  <div class="page">
+
+    <div class="atlas-header">
+      <h1>Career Atlas</h1>
+      <div class="ornament">
+        <div class="ornament-line"></div>
+        <div class="ornament-diamond"></div>
+        <div class="ornament-line r"></div>
+      </div>
+      <p>Click a stream to explore your paths</p>
+    </div>
+
+    <div class="flowchart">
+
+      <!-- ROOT NODE -->
+      <div class="root-node">
+        <h2>After Class X</h2>
+        <p>Choose your stream</p>
+      </div>
+
+      <!-- stem down from root -->
+      <div class="connector"></div>
+
+      <!-- horizontal T-bar fanning to 3 streams -->
+      <div class="connector-fan"></div>
+
+      <!-- three short vertical drops from the T-bar -->
+      <div class="stream-drops">
+        <div class="stream-drop"><div class="stream-drop-line"></div></div>
+        <div class="stream-drop"><div class="stream-drop-line"></div></div>
+        <div class="stream-drop"><div class="stream-drop-line"></div></div>
+      </div>
+
+      <!-- THE THREE STREAM NODES -->
+      <div class="stream-row">
+
+        <div class="stream-node science" id="btn-science" onclick="toggleStream('science')">
+          <span class="stream-emoji">🔬</span>
+          <h3>Science</h3>
+          <p>PCM / PCB</p>
+          <svg class="stream-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+
+        <div class="stream-node arts" id="btn-arts" onclick="toggleStream('arts')">
+          <span class="stream-emoji">🎨</span>
+          <h3>Arts</h3>
+          <p>Humanities</p>
+          <svg class="stream-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+
+        <div class="stream-node commerce" id="btn-commerce" onclick="toggleStream('commerce')">
+          <span class="stream-emoji">📈</span>
+          <h3>Commerce</h3>
+          <p>Business</p>
+          <svg class="stream-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+
+      </div>
+
+      <!-- CAREER PANELS (one per stream, hidden until stream is clicked) -->
+      <div class="careers-panel" id="panel-science">
+        <div class="careers-inner">
+          <div class="careers-grid" id="grid-science"></div>
+        </div>
+      </div>
+
+      <div class="careers-panel" id="panel-arts">
+        <div class="careers-inner">
+          <div class="careers-grid" id="grid-arts"></div>
+        </div>
+      </div>
+
+      <div class="careers-panel" id="panel-commerce">
+        <div class="careers-inner">
+          <div class="careers-grid" id="grid-commerce"></div>
+        </div>
+      </div>
+
+    </div><!-- .flowchart -->
+
+    <div class="scroll-hint">
+      Tap any career card to learn more
+      <span>↓</span>
+    </div>
+
+  </div><!-- .page -->
+
+  <button class="continue-btn" onclick="window.location.href='marks.html'">
+    Enter My Marks →
+  </button>
+
+  <!-- DETAIL MODAL -->
+  <div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+    <div class="modal" id="modal">
+      <div class="modal-handle"></div>
+      <div class="modal-title"  id="modalTitle"></div>
+      <div class="modal-badge"  id="modalBadge"></div>
+      <div class="modal-section">Entrance Exams</div>
+      <div class="chips"        id="modalExams"></div>
+      <div class="modal-section">Top Colleges</div>
+      <div class="chips"        id="modalColleges"></div>
+      <div class="modal-section">Expected Salary</div>
+      <div class="modal-salary" id="modalSalary"></div>
+      <div class="modal-suited" id="modalSuited"></div>
+      <button class="modal-close" onclick="closeModal()">Close  ✕</button>
+    </div>
+  </div>
+
+  <script>
+    // ═══════════════════════════════════════════════════
+    // CAREER DATA  — 18 careers across 3 streams
+    // ═══════════════════════════════════════════════════
+
+    const streams = {
+      science: {
+        careers: [
+          {
+            id:'engineering', emoji:'⚙️', title:'Engineering',
+            salary:'₹6L – ₹25L / yr', hint:'JEE · 4 yr B.Tech',
+            exams:['JEE Main','JEE Advanced','BITSAT','MHT-CET'],
+            colleges:['IIT Bombay','NIT Trichy','BITS Pilani','VIT Vellore'],
+            suited:'Best if you scored high in Math & Physics. Logical thinkers who enjoy building and problem-solving thrive here.'
+          },
+          {
+            id:'medicine', emoji:'🩺', title:'Medicine (MBBS)',
+            salary:'₹8L – ₹30L / yr', hint:'NEET · 5.5 yr MBBS',
+            exams:['NEET UG'],
+            colleges:['AIIMS Delhi','CMC Vellore','JIPMER','KMC Manipal'],
+            suited:'Best if Biology is your strongest subject. Requires patience — 5.5 years MBBS plus internship — but immensely rewarding.'
+          },
+          {
+            id:'datascience', emoji:'📊', title:'Data Science / AI',
+            salary:'₹8L – ₹40L / yr', hint:'JEE / CUET · 4 yr',
+            exams:['JEE Main','CUET','University Entrances'],
+            colleges:['IIT Madras','IISc Bangalore','IIIT Hyderabad','DTU Delhi'],
+            suited:"Perfect if you enjoy Math and spotting patterns. One of India's fastest-growing fields with strong global demand."
+          },
+          {
+            id:'architecture', emoji:'🏛️', title:'Architecture',
+            salary:'₹4L – ₹18L / yr', hint:'NATA · 5 yr B.Arch',
+            exams:['NATA','JEE Paper 2 (B.Arch)'],
+            colleges:['SPA Delhi','CEPT Ahmedabad','IIT Roorkee','RV College Bangalore'],
+            suited:'Best for students who are both creative and technical. Strong drawing skills combined with solid Math are essential.'
+          },
+          {
+            id:'research', emoji:'🧪', title:'Pure Science / Research',
+            salary:'₹5L – ₹20L / yr', hint:'IISER / IISc · PhD path',
+            exams:['KVPY','CUET','IISc Entrance','IISER Aptitude Test'],
+            colleges:['IISc Bangalore','IISER Pune','TIFR Mumbai','JNU Delhi'],
+            suited:'For deeply curious students who want to understand how the universe works. Long academic path but genuinely fulfilling.'
+          },
+          {
+            id:'pharmacy', emoji:'💊', title:'Pharmacy',
+            salary:'₹3.5L – ₹12L / yr', hint:'State CET · 4 yr B.Pharm',
+            exams:['NEET (some states)','GPAT (M.Pharm)','State CETs'],
+            colleges:['Manipal College of Pharmacy','JSS College Mysore','ICT Mumbai'],
+            suited:'Good if Biology & Chemistry are strong but you want a shorter path than MBBS. Solid demand in hospitals and pharma companies.'
+          }
+        ]
+      },
+      arts: {
+        careers: [
+          {
+            id:'law', emoji:'⚖️', title:'Law (LLB)',
+            salary:'₹5L – ₹25L / yr', hint:'CLAT · 5 yr BA LLB',
+            exams:['CLAT','AILET','LSAT India'],
+            colleges:['NLSIU Bangalore','NALSAR Hyderabad','NLU Delhi','Symbiosis Law'],
+            suited:'Arts students make exceptional lawyers. Strong reading, writing, and debate skills give you a natural courtroom advantage.'
+          },
+          {
+            id:'journalism', emoji:'📰', title:'Journalism & Media',
+            salary:'₹3.5L – ₹15L / yr', hint:'IIMC / CUET · 3 yr',
+            exams:['IIMC Entrance','ACJ Entrance','XIC Entrance','CUET'],
+            colleges:['IIMC Delhi','ACJ Chennai','Symbiosis Pune',"Xavier's Mumbai"],
+            suited:'Perfect for curious, communicative students who want to tell stories that matter. Digital media is rapidly expanding this field.'
+          },
+          {
+            id:'design', emoji:'✏️', title:'Design',
+            salary:'₹4L – ₹20L / yr', hint:'NID / NIFT · 4 yr',
+            exams:['NID Entrance','NIFT Entrance','UCEED','CEED'],
+            colleges:['NID Ahmedabad','NIFT Delhi','MIT Institute of Design','Pearl Academy'],
+            suited:'Best for visually creative students. Portfolio matters more than exam scores here — start building one early.'
+          },
+          {
+            id:'psychology', emoji:'🧠', title:'Psychology',
+            salary:'₹4L – ₹15L / yr', hint:'CUET · 3 yr BA',
+            exams:['CUET','DU Entrance','Christ University Entrance'],
+            colleges:['NIMHANS Bangalore','Delhi University','Christ University','TISS Mumbai'],
+            suited:"Best for empathetic, observant students. India's mental health sector is growing fast with strong demand expected over the next decade."
+          },
+          {
+            id:'upsc', emoji:'🏅', title:'Civil Services (IAS / IPS)',
+            salary:'₹7L – ₹25L + perks', hint:'UPSC CSE · graduation first',
+            exams:['UPSC CSE Prelims','UPSC CSE Mains','UPSC Interview'],
+            colleges:['LBSNAA (training)','Any strong graduation + self-study'],
+            suited:"For disciplined, service-minded students with broad knowledge. India's most competitive exam — demands long-term commitment."
+          },
+          {
+            id:'teaching', emoji:'👩‍🏫', title:'Teaching & Education',
+            salary:'₹3.5L – ₹12L / yr', hint:'CTET / BEd · 4 yr',
+            exams:['CTET','State TET','BEd Entrance','CUET'],
+            colleges:['RIE (Regional Institutes)','Jamia Millia Delhi','BHU Varanasi'],
+            suited:'Ideal for patient, communicative students who love explaining things clearly. EdTech startups are creating exciting new paths beyond classrooms.'
+          }
+        ]
+      },
+      commerce: {
+        careers: [
+          {
+            id:'ca', emoji:'📋', title:'Chartered Accountancy',
+            salary:'₹7L – ₹30L / yr', hint:'ICAI · 3–5 yr CA',
+            exams:['CA Foundation','CA Intermediate','CA Final (ICAI)'],
+            colleges:['ICAI (nationwide)','SRCC Delhi',"St. Xavier's Mumbai"],
+            suited:"Best for detail-oriented students strong in Accounts & Math. One of India's most respected professional qualifications."
+          },
+          {
+            id:'mba', emoji:'💼', title:'MBA / Business',
+            salary:'₹8L – ₹35L / yr', hint:'CAT · BBA then MBA',
+            exams:['CAT','XAT','SNAP','MAT'],
+            colleges:['IIM Ahmedabad','XLRI Jamshedpur','FMS Delhi','SP Jain Mumbai'],
+            suited:'Best for natural leaders who enjoy strategy. You do BBA first, then MBA — opens doors across virtually every industry.'
+          },
+          {
+            id:'banking', emoji:'🏦', title:'Banking & Finance',
+            salary:'₹5L – ₹20L / yr', hint:'IBPS / SBI PO',
+            exams:['IBPS PO','SBI PO','RBI Grade B','SEBI Grade A'],
+            colleges:['NIBM Pune','IIBF Mumbai','BCom + professional exam'],
+            suited:'Excellent for students who want stable, respected careers with structured growth and strong job security.'
+          },
+          {
+            id:'economics', emoji:'📉', title:'Economics',
+            salary:'₹5L – ₹22L / yr', hint:'CUET / DSE · 3 yr BA',
+            exams:['CUET','DU Entrance','JNU Entrance','DSE Entrance'],
+            colleges:['SRCC Delhi','LSR Delhi','Presidency Kolkata','Madras Christian College'],
+            suited:'Best for analytical thinkers who enjoy understanding how markets, money, and governments shape everyday life.'
+          },
+          {
+            id:'marketing', emoji:'📱', title:'Digital Marketing',
+            salary:'₹4L – ₹18L / yr', hint:'BBA / MICA · 3 yr',
+            exams:['CUET','University Entrances','BBA Entrances'],
+            colleges:['MICA Ahmedabad','Symbiosis Pune','Christ University Bangalore'],
+            suited:'Great for creative plus business-minded students. Fast-growing field with strong remote work and freelance opportunities.'
+          },
+          {
+            id:'lawcom', emoji:'⚖️', title:'Corporate Law',
+            salary:'₹5L – ₹25L / yr', hint:'CLAT · 5 yr BA LLB',
+            exams:['CLAT','AILET','LSAT India'],
+            colleges:['NLSIU Bangalore','NALSAR Hyderabad','NLU Delhi','Symbiosis Law'],
+            suited:'Commerce students make excellent corporate lawyers. Your business understanding gives a natural edge in corporate and tax law.'
+          }
+        ]
+      }
+    };
+
+    // ═══════════════════════════════════════════════════
+    // BUILD CAREER GRIDS — runs once on page load
+    // Iterates through each stream and creates card HTML
+    // ═══════════════════════════════════════════════════
+
+    Object.keys(streams).forEach(streamKey => {
+      const grid = document.getElementById('grid-' + streamKey);
+      streams[streamKey].careers.forEach(career => {
+        const card = document.createElement('div');
+        card.className = `career-card ${streamKey}`;
+        card.innerHTML = `
+          <span class="career-emoji">${career.emoji}</span>
+          <h4>${career.title}</h4>
+          <div class="career-salary">${career.salary}</div>
+          <div class="career-hint">${career.hint}</div>
+        `;
+        card.addEventListener('click', () => openModal(career, streamKey));
+        grid.appendChild(card);
+      });
+    });
+
+    // ═══════════════════════════════════════════════════
+    // STREAM TOGGLE
+    // Only one stream open at a time — clicking a second
+    // stream closes the first before opening the new one.
+    // ═══════════════════════════════════════════════════
+
+    let activeStream = null;
+
+    function toggleStream(name) {
+      if (activeStream === name) {
+        closeStream(name);
+        activeStream = null;
+      } else {
+        if (activeStream) closeStream(activeStream);
+        openStream(name);
+        activeStream = name;
+      }
+    }
+
+    function openStream(name) {
+      const btn   = document.getElementById('btn-' + name);
+      const panel = document.getElementById('panel-' + name);
+      const cards = panel.querySelectorAll('.career-card');
+
+      btn.classList.add('open');
+      panel.classList.add('open');
+
+      // Stagger each card's reveal so they appear one-by-one
+      cards.forEach((card, i) => {
+        card.classList.remove('revealed');
+        setTimeout(() => card.classList.add('revealed'), 80 + i * 60);
+      });
+
+      // Scroll the panel into view after the animation starts
+      setTimeout(() => {
+        panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 120);
+    }
+
+    function closeStream(name) {
+      const btn   = document.getElementById('btn-' + name);
+      const panel = document.getElementById('panel-' + name);
+      btn.classList.remove('open');
+      panel.classList.remove('open');
+      panel.querySelectorAll('.career-card').forEach(c => c.classList.remove('revealed'));
+    }
+
+    // ═══════════════════════════════════════════════════
+    // MODAL — opens when a career card is clicked
+    // ═══════════════════════════════════════════════════
+
+    function openModal(career, streamKey) {
+      document.getElementById('modalTitle').textContent  = career.title;
+      document.getElementById('modalBadge').textContent  =
+        streamKey.charAt(0).toUpperCase() + streamKey.slice(1) + ' Stream';
+      document.getElementById('modalSalary').textContent = career.salary;
+      document.getElementById('modalSuited').textContent = career.suited;
+
+      ['modalExams', 'modalColleges'].forEach(elId => {
+        const el    = document.getElementById(elId);
+        el.innerHTML = '';
+        const items = elId === 'modalExams' ? career.exams : career.colleges;
+        items.forEach(item => {
+          const chip = document.createElement('div');
+          chip.className   = 'chip';
+          chip.textContent = item;
+          el.appendChild(chip);
+        });
+      });
+
+      document.getElementById('modalOverlay').classList.add('active');
+      document.body.style.overflow = 'hidden'; // prevent scroll behind modal
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    // Close modal if user clicks the dark overlay (outside the card)
+    function handleOverlayClick(e) {
+      if (e.target === document.getElementById('modalOverlay')) closeModal();
+    }
+
+    // Also close on Escape key
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeModal();
+    });
+  </script>
+
 </body>
 </html>
