@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<!-- saved from url=(0034)http://127.0.0.1:5500/analyze.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Step 6 — AI Analyses Everything</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link href="./Step 6 — AI Analyses Everything_files/css2" rel="stylesheet">
 <style>
   :root {
     --amber-50: #fffbf2;
@@ -208,27 +208,32 @@
   .sal-label { font-size: 11px; color: var(--text-soft); }
   .sal-val { font-size: 14px; font-weight: 600; color: var(--text-dark); }
 
-  /* IMPROVEMENT */
-  .improve-section { margin-bottom: 1.75rem; }
-  .improve-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; }
-  .improve-intro { font-size: 14px; color: var(--text-soft); margin-bottom: 1.25rem; line-height: 1.6; }
-  .improve-item {
-    display: flex; align-items: flex-start; gap: 12px;
-    padding: 12px 0; border-bottom: 1px solid var(--border);
+  /* PERSONALITY BREAKDOWN */
+  .personality-section { margin-bottom: 1.75rem; }
+  .personality-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; }
+  .personality-header { display: flex; align-items: center; gap: 14px; margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+  .personality-type-badge {
+    background: var(--amber-100); color: var(--amber-800);
+    font-size: 13px; font-weight: 700; padding: 6px 16px; border-radius: 20px; letter-spacing: 0.03em;
   }
-  .improve-item:last-child { border-bottom: none; padding-bottom: 0; }
-  .improve-num {
-    width: 28px; height: 28px; background: var(--amber-100); color: var(--amber-700);
-    border-radius: 8px; display: flex; align-items: center; justify-content: center;
-    font-size: 13px; font-weight: 700; flex-shrink: 0;
+  .personality-tagline { font-size: 13px; color: var(--text-soft); line-height: 1.5; }
+  .quiz-breakdown { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.25rem; }
+  .quiz-cat-card {
+    background: var(--amber-50); border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px; text-align: center; position: relative; overflow: hidden;
   }
-  .improve-text { flex: 1; }
-  .improve-title-text { font-size: 14px; font-weight: 600; color: var(--text-dark); margin-bottom: 3px; }
-  .improve-desc { font-size: 13px; color: var(--text-soft); line-height: 1.6; }
-  .improve-tag {
-    display: inline-block; margin-top: 6px; font-size: 11px; font-weight: 600;
-    background: var(--amber-100); color: var(--amber-700); padding: 2px 9px; border-radius: 20px;
+  .quiz-cat-card.dominant { border-color: var(--amber-400); }
+  .quiz-cat-card.dominant::after {
+    content: 'Dominant'; position: absolute; top: 6px; right: 8px;
+    font-size: 9px; font-weight: 700; color: var(--amber-600); letter-spacing: 0.05em; text-transform: uppercase;
   }
+  .quiz-cat-icon { font-size: 20px; margin-bottom: 6px; }
+  .quiz-cat-name { font-size: 11px; font-weight: 600; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+  .quiz-cat-score { font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--amber-700); line-height: 1; margin-bottom: 4px; }
+  .quiz-cat-max { font-size: 11px; color: var(--text-soft); }
+  .quiz-cat-bar { height: 5px; background: var(--amber-100); border-radius: 3px; margin-top: 8px; overflow: hidden; }
+  .quiz-cat-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--amber-300), var(--amber-600)); transition: width 1.4s cubic-bezier(0.4,0,0.2,1); }
+  .personality-insight { background: var(--amber-50); border-left: 3px solid var(--amber-400); border-radius: 0 10px 10px 0; padding: 12px 14px; font-size: 13px; color: var(--text-mid); line-height: 1.65; }
 
   /* DISCLAIMER & NEXT */
   .disclaimer {
@@ -281,7 +286,7 @@
   <div class="page-header">
     <div class="badge"><div class="badge-dot"></div> Step 6 of 8 — New</div>
     <div class="page-title">AI Analyses Everything</div>
-    <div class="page-sub">Your academic marks, personality profile, and AI chat history are processed together to generate a personalised stream recommendation, career paths, salary projections, and an improvement plan.</div>
+    <div class="page-sub">Tumhare academic marks, personality quiz results (Step 5), aur AI chat history — teeno milake ek personalised stream recommendation generate hoti hai.</div>
   </div>
 
   <!-- SNAPSHOT -->
@@ -306,37 +311,35 @@
   <!-- MARKS -->
   <div class="marks-card">
     <div class="card-heading">Subject-wise Marks</div>
-    <div class="bar-row"><span class="bar-subj">Mathematics</span><div class="bar-track"><div class="bar-fill" data-w="88"></div></div><span class="bar-num">88%</span></div>
-    <div class="bar-row"><span class="bar-subj">Science</span><div class="bar-track"><div class="bar-fill" data-w="82"></div></div><span class="bar-num">82%</span></div>
-    <div class="bar-row"><span class="bar-subj">English</span><div class="bar-track"><div class="bar-fill" data-w="75"></div></div><span class="bar-num">75%</span></div>
-    <div class="bar-row"><span class="bar-subj">Social Science</span><div class="bar-track"><div class="bar-fill" data-w="70"></div></div><span class="bar-num">70%</span></div>
-    <div class="bar-row"><span class="bar-subj">Hindi</span><div class="bar-track"><div class="bar-fill" data-w="65"></div></div><span class="bar-num">65%</span></div>
-    <div class="bar-row"><span class="bar-subj">Computer Sci.</span><div class="bar-track"><div class="bar-fill" data-w="90"></div></div><span class="bar-num">90%</span></div>
+    <div class="bar-row"><span class="bar-subj">Mathematics</span><div class="bar-track"><div class="bar-fill" data-w="88" style="width: 88%;"></div></div><span class="bar-num">88%</span></div>
+    <div class="bar-row"><span class="bar-subj">Science</span><div class="bar-track"><div class="bar-fill" data-w="82" style="width: 82%;"></div></div><span class="bar-num">82%</span></div>
+    <div class="bar-row"><span class="bar-subj">English</span><div class="bar-track"><div class="bar-fill" data-w="75" style="width: 75%;"></div></div><span class="bar-num">75%</span></div>
+    <div class="bar-row"><span class="bar-subj">Social Science</span><div class="bar-track"><div class="bar-fill" data-w="70" style="width: 70%;"></div></div><span class="bar-num">70%</span></div>
+    <div class="bar-row"><span class="bar-subj">Hindi</span><div class="bar-track"><div class="bar-fill" data-w="65" style="width: 65%;"></div></div><span class="bar-num">65%</span></div>
+    <div class="bar-row"><span class="bar-subj">Computer Sci.</span><div class="bar-track"><div class="bar-fill" data-w="90" style="width: 90%;"></div></div><span class="bar-num">90%</span></div>
   </div>
 
   <!-- BUTTON -->
   <div class="btn-wrap">
-    <button class="analyse-btn" id="analyseBtn" onclick="startAnalysis()">
-      &#9654;&nbsp; Analyse My Profile with AI
-    </button>
+    <button class="analyse-btn" id="analyseBtn" onclick="startAnalysis()" disabled="">✓&nbsp; Analysis Complete</button>
   </div>
 
   <!-- LOADING -->
   <div class="loading-box" id="loadingBox">
     <div class="spinner"></div>
     <div class="loading-steps">
-      <div class="loading-step" id="ls0">&#9679;&nbsp; Sending profile to Claude API...</div>
-      <div class="loading-step" id="ls1">&#9679;&nbsp; Processing marks and weighted scores...</div>
-      <div class="loading-step" id="ls2">&#9679;&nbsp; Analysing personality type and thinking style...</div>
-      <div class="loading-step" id="ls3">&#9679;&nbsp; Reviewing AI chat history for interest signals...</div>
-      <div class="loading-step" id="ls4">&#9679;&nbsp; Generating personalised stream recommendations...</div>
-      <div class="loading-step" id="ls5">&#9679;&nbsp; Calculating career paths and salary data...</div>
-      <div class="loading-step" id="ls6">&#9679;&nbsp; Preparing improvement suggestions...</div>
+      <div class="loading-step done" id="ls0">●&nbsp; Sending profile to Claude API...</div>
+      <div class="loading-step done" id="ls1">●&nbsp; Processing marks and weighted scores...</div>
+      <div class="loading-step done" id="ls2">●&nbsp; Analysing personality type and thinking style...</div>
+      <div class="loading-step done" id="ls3">●&nbsp; Reviewing AI chat history for interest signals...</div>
+      <div class="loading-step done" id="ls4">●&nbsp; Generating personalised stream recommendations...</div>
+      <div class="loading-step done" id="ls5">●&nbsp; Calculating career paths and salary data...</div>
+      <div class="loading-step done" id="ls6">●&nbsp; Compiling personalised stream report...</div>
     </div>
   </div>
 
   <!-- RESULTS -->
-  <div class="results" id="results">
+  <div class="results show" id="results">
 
     <div class="section-label">Stream Recommendations</div>
     <div class="stream-cards">
@@ -348,7 +351,7 @@
           <span class="stream-rank-badge rank-1">Best Match</span>
         </div>
         <div class="compat-row">
-          <div class="compat-track"><div class="compat-fill" data-w="91"></div></div>
+          <div class="compat-track"><div class="compat-fill" data-w="91" style="width: 91%;"></div></div>
           <span class="compat-pct">91%</span>
         </div>
         <div class="ai-reason">Your Mathematics score of 88% and Computer Science score of 90% reflect a strong aptitude for logical and quantitative reasoning. Combined with your Analytical personality profile — which excels at pattern recognition and structured problem-solving — Science (PCM) represents the strongest alignment with your academic strengths and cognitive style. Your AI chat history also revealed consistent curiosity around technology and engineering topics.</div>
@@ -380,7 +383,7 @@
           <span class="stream-rank-badge rank-2">Second Match</span>
         </div>
         <div class="compat-row">
-          <div class="compat-track"><div class="compat-fill" data-w="74"></div></div>
+          <div class="compat-track"><div class="compat-fill" data-w="74" style="width: 74%;"></div></div>
           <span class="compat-pct">74%</span>
         </div>
         <div class="ai-reason">Your Science score of 82% shows solid potential in biological sciences. However, your AI chat history reflects a stronger interest in technology and computing, which aligns less directly with PCB. This stream remains a viable option if your interest shifts toward medicine or life sciences in the future.</div>
@@ -411,7 +414,7 @@
           <span class="stream-rank-badge rank-3">Third Match</span>
         </div>
         <div class="compat-row">
-          <div class="compat-track"><div class="compat-fill" data-w="58"></div></div>
+          <div class="compat-track"><div class="compat-fill" data-w="58" style="width: 58%;"></div></div>
           <span class="compat-pct">58%</span>
         </div>
         <div class="ai-reason">Your Mathematics strength is transferable to Commerce through Accountancy and Economics. However, your personality type and subject preferences suggest a stronger inclination towards technical and scientific disciplines. Commerce is a reasonable alternative if you prefer a less competitive entrance exam pathway.</div>
@@ -437,55 +440,42 @@
 
     </div>
 
-    <!-- IMPROVEMENT -->
-    <div class="improve-section">
-      <div class="section-label">Personalised Improvement Suggestions</div>
-      <div class="improve-card">
-        <div class="improve-intro">Based on your full profile, the following targeted improvements will strengthen both your board performance and entrance exam readiness.</div>
+    <!-- PERSONALITY QUIZ BREAKDOWN -->
+    <div class="personality-section">
+      <div class="section-label">Personality + Aptitude Analysis</div>
+      <div class="personality-card">
 
-        <div class="improve-item">
-          <div class="improve-num">1</div>
-          <div class="improve-text">
-            <div class="improve-title-text">Strengthen Hindi — Urgent</div>
-            <div class="improve-desc">Your Hindi score of 65% is the weakest subject. Strengthening language skills will benefit performance in the CUET entrance exam, which includes a mandatory language section.</div>
-            <span class="improve-tag">Focus: Hindi</span>
+        <div class="personality-header">
+          <div class="personality-type-badge">🧠 Analytical Thinker</div>
+          <div class="personality-tagline">The following results are derived from your 40-question aptitude assessment (Step 5). Your dominant thinking style has been identified and incorporated directly into the stream compatibility analysis above.</div>
+        </div>
+
+        <div class="quiz-breakdown">
+          <div class="quiz-cat-card dominant">
+            <div class="quiz-cat-icon">🔢</div>
+            <div class="quiz-cat-name">Analytical</div>
+            <div class="quiz-cat-score">13<span style="font-size:14px;color:var(--text-soft)">/13</span></div>
+            <div class="quiz-cat-max">Data interpretation &amp; decision making</div>
+            <div class="quiz-cat-bar"><div class="quiz-cat-fill" style="width:100%"></div></div>
+          </div>
+          <div class="quiz-cat-card">
+            <div class="quiz-cat-icon">🔍</div>
+            <div class="quiz-cat-name">Logical</div>
+            <div class="quiz-cat-score">10<span style="font-size:14px;color:var(--text-soft)">/14</span></div>
+            <div class="quiz-cat-max">Pattern recognition &amp; mathematical reasoning</div>
+            <div class="quiz-cat-bar"><div class="quiz-cat-fill" style="width:71%"></div></div>
+          </div>
+          <div class="quiz-cat-card">
+            <div class="quiz-cat-icon">🎨</div>
+            <div class="quiz-cat-name">Creative</div>
+            <div class="quiz-cat-score">6<span style="font-size:14px;color:var(--text-soft)">/13</span></div>
+            <div class="quiz-cat-max">Open-ended thinking &amp; imagination</div>
+            <div class="quiz-cat-bar"><div class="quiz-cat-fill" style="width:46%"></div></div>
           </div>
         </div>
 
-        <div class="improve-item">
-          <div class="improve-num">2</div>
-          <div class="improve-text">
-            <div class="improve-title-text">Improve Social Science for Board Percentage</div>
-            <div class="improve-desc">Your Social Science score of 70% contributes significantly to your overall Class 10 board percentage, which many colleges use for admission cutoffs even for Science stream applicants.</div>
-            <span class="improve-tag">Focus: Social Science</span>
-          </div>
-        </div>
-
-        <div class="improve-item">
-          <div class="improve-num">3</div>
-          <div class="improve-text">
-            <div class="improve-title-text">Begin JEE Foundation Preparation Now</div>
-            <div class="improve-desc">Your Mathematics (88%) and Computer Science (90%) scores provide a strong head start for JEE Mains. Starting foundation preparation in Class 11 significantly improves long-term outcome probabilities.</div>
-            <span class="improve-tag">JEE Preparation</span>
-          </div>
-        </div>
-
-        <div class="improve-item">
-          <div class="improve-num">4</div>
-          <div class="improve-text">
-            <div class="improve-title-text">Channel Your Analytical Strength Effectively</div>
-            <div class="improve-desc">Your Analytical personality type responds best to structured, methodical study. Practising previous-year JEE Mains papers using timed sessions will channel this strength most effectively.</div>
-            <span class="improve-tag">Study Strategy</span>
-          </div>
-        </div>
-
-        <div class="improve-item">
-          <div class="improve-num">5</div>
-          <div class="improve-text">
-            <div class="improve-title-text">Learn Basic Programming Alongside Class 11</div>
-            <div class="improve-desc">Your Computer Science aptitude (90%) is exceptional. Pursuing Python or C++ beyond the curriculum will create a significant career advantage and reinforce your JEE preparation in the long term.</div>
-            <span class="improve-tag">Skill Building</span>
-          </div>
+        <div class="personality-insight">
+          <strong>AI Insight:</strong> Your Analytical category score is the highest across all three dimensions, indicating a strong aptitude for structured reasoning, data interpretation, and methodical problem-solving. This cognitive profile aligns most closely with Science (PCM), where Physics and Mathematics demand precisely this thinking style — which is the primary reason Science received a 91% compatibility rating in your results above.
         </div>
 
       </div>
@@ -493,13 +483,13 @@
 
     <!-- DISCLAIMER -->
     <div class="disclaimer">
-      <span class="disc-icon">&#9432;</span>
+      <span class="disc-icon">ⓘ</span>
       This analysis has been generated by AI based on your academic marks, personality type, and AI chat history. It is a data-backed suggestion intended to guide your decision — the final choice of stream rests entirely with you and your family.
     </div>
 
     <!-- NEXT -->
-    <button class="next-btn" onclick="alert('Proceeding to Step 7 — Why You? Explanation')">
-      Continue to Step 7 — "Why You?" Explanation &nbsp;&rarr;
+    <button class="next-btn" onclick="alert(&#39;Proceeding to Step 7 — Why You? Explanation&#39;)">
+      Continue to Step 7 — "Why You?" Explanation &nbsp;→
     </button>
 
   </div>
@@ -546,5 +536,44 @@
     }, 750);
   }
 </script>
-</body>
-</html>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+
+
+</body></html>
