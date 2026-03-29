@@ -1,89 +1,206 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <!-- This makes the site look correct on mobile phones -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pathfindr - Marks Entry</title>
-  <!-- Font Awesome for Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-  <!-- Link to our shared stylesheet -->
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Pathfindr - Marks Entry</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg,#FFF5D6,#F6D68A,#E0A93B);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+.container {
+  background:white;
+  padding:30px;
+  border-radius:20px;
+  width:400px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.2);
+}
+
+h1 {
+  text-align:center;
+  color:#FF8C00;
+}
+
+.center-text {
+  text-align:center;
+  font-size:0.9rem;
+  margin-bottom:20px;
+  color:#555;
+}
+
+.subject-card {
+  display:flex;
+  align-items:center;
+  margin-bottom:15px;
+}
+
+.icon-circle {
+  width:40px;
+  height:40px;
+  background:#FF8C00;
+  color:white;
+  border-radius:50%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  margin-right:10px;
+}
+
+.subject-info {
+  flex:1;
+}
+
+input {
+  width:100%;
+  padding:8px;
+  border:none;
+  border-bottom:2px solid #FF8C00;
+  outline:none;
+}
+
+.btn-save {
+  width:100%;
+  margin-top:20px;
+  padding:12px;
+  border:none;
+  border-radius:25px;
+  background:linear-gradient(135deg,#FF8C00,#FFA500);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.btn-save:hover {
+  opacity:0.9;
+}
+</style>
 </head>
+
 <body>
 
-  <div class="container doodle-boundary">
-    <!-- Extra Doodle Elements for all corners -->
-    <div class="doodle-item top-left"><i class="fas fa-pencil-alt"></i></div>
-    <div class="doodle-item top-right"><i class="fas fa-lightbulb"></i></div>
-    <div class="doodle-item bottom-left"><i class="fas fa-graduation-cap"></i></div>
-    <div class="doodle-item bottom-right"><i class="fas fa-rocket"></i></div>
-    <div class="doodle-item mid-left"><i class="fas fa-star"></i></div>
-    <div class="doodle-item mid-right"><i class="fas fa-heart"></i></div>
+<div class="container">
 
-    <!-- More internal doodles -->
-    <div class="internal-doodle d1"><i class="fas fa-atom"></i></div>
-    <div class="internal-doodle d2"><i class="fas fa-shapes"></i></div>
-    <div class="internal-doodle d3"><i class="fas fa-palette"></i></div>
-    <div class="internal-doodle d4"><i class="fas fa-microscope"></i></div>
+<h1>Enter Your Data</h1>
+<p class="center-text">Make your future brighter ✨</p>
 
-    <h1>enter your data</h1>
-    <p class="center-text">make the future Brighter, Shiner, Secure</p>
-    
-    <form id="marksForm" class="marks-showcase">
-      <div class="subject-card">
-        <div class="icon-circle"><i class="fas fa-book"></i></div>
-        <div class="subject-info">
-          <label for="english">English</label>
-          <input type="number" id="english" min="0" max="100" required placeholder="00">
-        </div>
-      </div>
-      
-      <div class="subject-card">
-        <div class="icon-circle"><i class="fas fa-language"></i></div>
-        <div class="subject-info">
-          <label for="hindi">Hindi</label>
-          <input type="number" id="hindi" min="0" max="100" required placeholder="00">
-        </div>
-      </div>
-      
-      <div class="subject-card">
-        <div class="icon-circle"><i class="fas fa-calculator"></i></div>
-        <div class="subject-info">
-          <label for="maths">Maths</label>
-          <input type="number" id="maths" min="0" max="100" required placeholder="00">
-        </div>
-      </div>
-      
-      <div class="subject-card">
-        <div class="icon-circle"><i class="fas fa-flask"></i></div>
-        <div class="subject-info">
-          <label for="science">Science</label>
-          <input type="number" id="science" min="0" max="100" required placeholder="00">
-        </div>
-      </div>
-      
-      <div class="subject-card">
-        <div class="icon-circle"><i class="fas fa-globe-asia"></i></div>
-        <div class="subject-info">
-          <label for="social">Social Science</label>
-          <input type="number" id="social" min="0" max="100" required placeholder="00">
-        </div>
-      </div>
-      
-      <div class="subject-card">
-        <div class="icon-circle"><i class="fas fa-desktop"></i></div>
-        <div class="subject-info">
-          <label for="computer">Computer</label>
-          <input type="number" id="computer" min="0" max="100" required placeholder="00">
-        </div>
-      </div>
-      
-      <button type="submit" class="btn-save">Save & Continue <i class="fas fa-arrow-right"></i></button>
-    </form>
-  </div>
+<form id="marksForm">
 
-  <!-- Link to our shared JavaScript file -->
-  <script src="app.js"></script>
+<div class="subject-card">
+<div class="icon-circle"><i class="fas fa-book"></i></div>
+<div class="subject-info">
+<label>English</label>
+<input type="number" id="english" required min="0" max="100"
+oninput="this.value=Math.min(100,Math.max(0,this.value))">
+</div>
+</div>
+
+<div class="subject-card">
+<div class="icon-circle"><i class="fas fa-language"></i></div>
+<div class="subject-info">
+<label>Hindi</label>
+<input type="number" id="hindi" required min="0" max="100"
+oninput="this.value=Math.min(100,Math.max(0,this.value))">
+</div>
+</div>
+
+<div class="subject-card">
+<div class="icon-circle"><i class="fas fa-calculator"></i></div>
+<div class="subject-info">
+<label>Maths</label>
+<input type="number" id="maths" required min="0" max="100"
+oninput="this.value=Math.min(100,Math.max(0,this.value))">
+</div>
+</div>
+
+<div class="subject-card">
+<div class="icon-circle"><i class="fas fa-flask"></i></div>
+<div class="subject-info">
+<label>Science</label>
+<input type="number" id="science" required min="0" max="100"
+oninput="this.value=Math.min(100,Math.max(0,this.value))">
+</div>
+</div>
+
+<div class="subject-card">
+<div class="icon-circle"><i class="fas fa-globe"></i></div>
+<div class="subject-info">
+<label>Social Science</label>
+<input type="number" id="social" required min="0" max="100"
+oninput="this.value=Math.min(100,Math.max(0,this.value))">
+</div>
+</div>
+
+<div class="subject-card">
+<div class="icon-circle"><i class="fas fa-desktop"></i></div>
+<div class="subject-info">
+<label>Computer</label>
+<input type="number" id="computer" required min="0" max="100"
+oninput="this.value=Math.min(100,Math.max(0,this.value))">
+</div>
+</div>
+
+<button type="submit" class="btn-save">
+Talk to Pathfindr AI → 🤖
+</button>
+
+</form>
+</div>
+
+<script>
+
+document.getElementById("marksForm").addEventListener("submit", function(e){
+  e.preventDefault();
+
+  const subjects=["english","hindi","maths","science","social","computer"];
+  const marks={};
+
+  for(let sub of subjects){
+    const val=document.getElementById(sub).value.trim();
+
+    if(val===""){
+      alert("Please fill all marks");
+      return;
+    }
+
+    const num=Number(val);
+
+    if(isNaN(num)||num<0||num>100){
+      alert("Marks must be between 0 and 100");
+      return;
+    }
+
+    marks[sub]=num;
+  }
+
+  // 🎯 Score calculation
+  const scores={
+    science: Math.round((marks.maths+marks.science+marks.computer)/3),
+    commerce: Math.round((marks.maths+marks.english+marks.social)/3),
+    arts: Math.round((marks.english+marks.hindi+marks.social)/3)
+  };
+
+  const topStream=Object.keys(scores).reduce((a,b)=>scores[a]>scores[b]?a:b);
+
+  // 💾 Save data
+  localStorage.setItem("marks",JSON.stringify(marks));
+  localStorage.setItem("scores",JSON.stringify(scores));
+  localStorage.setItem("topStream",topStream);
+
+  // 🚀 Next step
+  window.location.href="chat.html";
+
+});
+
+</script>
+
 </body>
 </html>
