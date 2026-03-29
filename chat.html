@@ -1,367 +1,184 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<<<<<<< HEAD
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Student AI Mentor</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<title>Pathfindr AI</title>
+
 <style>
-    :root {
-        --primary-orange: #FF8C00; /* Dark Orange */
-        --light-orange: #FFB347; /* Yellowish Orange */
-        --bg-cream: #FFF8F0;
-        --white: #ffffff;
-        --text-dark: #2D2D2D;
-    }
+body {
+  margin:0;
+  font-family: Arial;
+  background: linear-gradient(#FFF5D6,#F6D68A);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
 
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+/* CHAT BOX */
+.chat {
+  width:400px;
+  height:600px;
+  background:white;
+  border-radius:20px;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
 
-    body {
-        background-color: var(--bg-cream);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        overflow: hidden;
-    }
+.header {
+  background:#FF8C00;
+  color:white;
+  padding:15px;
+  text-align:center;
+  font-weight:bold;
+}
 
-    /* Mode Selection Overlay */
-    #mode-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(255, 248, 240, 0.95);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-        transition: opacity 0.5s ease, visibility 0.5s;
-    }
+.messages {
+  flex:1;
+  padding:10px;
+  overflow-y:auto;
+}
 
-    .overlay-content {
-        text-align: center;
-        animation: fadeInDown 0.8s ease-out;
-    }
+.msg {
+  margin:5px;
+  padding:8px;
+  border-radius:10px;
+  max-width:70%;
+  white-space:pre-wrap;
+}
 
-    .overlay-content h1 {
-        color: var(--primary-orange);
-        margin-bottom: 30px;
-        font-size: 2rem;
-        font-weight: 700;
-    }
+.user {
+  background:#FF8C00;
+  color:white;
+  margin-left:auto;
+}
 
-    .mode-options {
-        display: flex;
-        gap: 30px;
-        perspective: 1000px;
-    }
+.ai {
+  background:#eee;
+}
 
-    .mode-card {
-        background: var(--white);
-        width: 200px;
-        padding: 40px 20px;
-        border-radius: 25px;
-        box-shadow: 0 15px 35px rgba(255, 140, 0, 0.1);
-        cursor: pointer;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 20px;
-        border: 2px solid transparent;
-    }
+.input {
+  display:flex;
+}
 
-    .mode-card:hover {
-        transform: translateY(-15px) rotateX(10deg);
-        border-color: var(--primary-orange);
-        box-shadow: 0 20px 45px rgba(255, 140, 0, 0.2);
-    }
+input {
+  flex:1;
+  padding:10px;
+  border:none;
+  outline:none;
+}
 
-    .mode-icon {
-        font-size: 3.5rem;
-        background: #FFF0E0;
-        width: 100px;
-        height: 100px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        transition: transform 0.3s ease;
-    }
+button {
+  background:#FF8C00;
+  color:white;
+  border:none;
+  padding:10px;
+  cursor:pointer;
+}
 
-    .mode-card:hover .mode-icon {
-        transform: scale(1.1) rotate(5deg);
-    }
-
-    .mode-card h3 {
-        color: var(--text-dark);
-        font-size: 1.2rem;
-        font-weight: 600;
-    }
-
-    .mode-card p {
-        font-size: 0.85rem;
-        color: #777;
-        line-height: 1.4;
-    }
-
-    @keyframes fadeInDown {
-        from { opacity: 0; transform: translateY(-30px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    .chat-container {
-        width: 100%;
-        max-width: 500px;
-        height: 85vh;
-        background: var(--white);
-        border-radius: 20px;
-        box-shadow: 0 10px 25px rgba(255, 140, 0, 0.15);
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-        border: 1px solid var(--light-orange);
-        opacity: 0;
-        transform: scale(0.95);
-        transition: all 0.5s ease;
-        visibility: hidden;
-    }
-
-    .chat-container.visible {
-        opacity: 1;
-        transform: scale(1);
-        visibility: visible;
-    }
-
-    /* Header */
-    .chat-header {
-        background: linear-gradient(135deg, var(--light-orange), var(--primary-orange));
-        padding: 20px;
-        color: white;
-        text-align: center;
-    }
-
-    .chat-header h2 { font-size: 1.2rem; font-weight: 600; }
-    .chat-header p { font-size: 0.8rem; opacity: 0.9; }
-
-    /* Messages Area */
-    #chat-box {
-        flex: 1;
-        padding: 20px;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-        background-image: radial-gradient(var(--light-orange) 0.5px, transparent 0.5px);
-        background-size: 20px 20px;
-        background-color: #fffdfa;
-    }
-
-    .message {
-        max-width: 80%;
-        padding: 12px 16px;
-        border-radius: 15px;
-        font-size: 0.95rem;
-        line-height: 1.5;
-    }
-
-    .ai-message {
-        align-self: flex-start;
-        background: #f0f0f0;
-        color: var(--text-dark);
-        border-bottom-left-radius: 2px;
-    }
-
-    .user-message {
-        align-self: flex-end;
-        background: var(--primary-orange);
-        color: white;
-        border-bottom-right-radius: 2px;
-    }
-
-    /* Input Area */
-    .input-area {
-        padding: 15px;
-        background: white;
-        border-top: 1px solid #eee;
-        display: flex;
-        gap: 10px;
-        align-items: center;
-    }
-
-    .mic-btn {
-        background: #f0f0f0;
-        color: var(--primary-orange);
-        border: none;
-        width: 45px;
-        height: 45px;
-        border-radius: 50%;
-        cursor: pointer;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.2rem;
-        transition: 0.3s;
-    }
-
-    .mic-btn:hover {
-        background: #e0e0e0;
-        transform: scale(1.1);
-    }
-
-    .mic-btn.active {
-        display: flex;
-    }
-
-    input {
-        flex: 1;
-        padding: 12px;
-        border: 1.5px solid #eee;
-        border-radius: 10px;
-        outline: none;
-        transition: 0.3s;
-    }
-
-    input:focus { border-color: var(--primary-orange); }
-
-    button {
-        background: var(--primary-orange);
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 10px;
-        cursor: pointer;
-        font-weight: 600;
-        transition: 0.3s;
-    }
-
-    button:hover { background: var(--light-orange); }
+/* 🎯 OUTSIDE BUTTON */
+.quiz-btn {
+  margin-top:15px;
+  width:200px;
+  border-radius:10px;
+}
 </style>
-=======
-  <meta charset="UTF-8" />
-  <!-- This makes the site look correct on mobile phones -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pathfindr</title>
-  <!-- Link to our shared stylesheet -->
-  <link rel="stylesheet" href="style.css" />
->>>>>>> e48ba93091c9cee34e8c8650c3b96e7125f4fb4f
 </head>
+
 <body>
 
-<div id="mode-overlay">
-    <div class="overlay-content">
-        <h1>How would you like to learn?</h1>
-        <div class="mode-options">
-            <div class="mode-card" onclick="selectMode('text')">
-                <div class="mode-icon">💬</div>
-                <h3>Text with AI</h3>
-                <p>Chat naturally through messages and get instant help.</p>
-            </div>
-            <div class="mode-card" onclick="selectMode('talk')">
-                <div class="mode-icon">🎙️</div>
-                <h3>Talk with AI</h3>
-                <p>Use your voice to interact and listen to explanations.</p>
-            </div>
-        </div>
-    </div>
+<!-- ✅ CHAT -->
+<div class="chat">
+  <div class="header">Pathfindr AI 🤖</div>
+
+  <div id="messages" class="messages"></div>
+
+  <div class="input">
+    <input id="input" placeholder="Ask anything..." onkeypress="handleKey(event)">
+    <button onclick="send()">Send</button>
+  </div>
 </div>
 
-<div class="chat-container">
-    <div class="chat-header">
-        <h2>Academic AI Assistant</h2>
-        <p>Formal • Polite • Insightful</p>
-    </div>
-
-    <div id="chat-box">
-        <!-- Messages will be appended here by JS -->
-    </div>
-
-    <div class="input-area">
-        <button id="mic-btn" class="mic-btn" onclick="toggleMic()">🎙️</button>
-        <input type="text" id="userInput" placeholder="Type your academic query here..." onkeypress="handleKey(event)">
-        <button onclick="sendMessage()">Send</button>
-    </div>
-</div>
+<!-- ✅ BUTTON OUTSIDE -->
+<button class="quiz-btn" onclick="goToQuiz()">
+  Take Quiz 🎯
+</button>
 
 <script>
-    const chatBox = document.getElementById('chat-box');
-    const userInput = document.getElementById('userInput');
-    const modeOverlay = document.getElementById('mode-overlay');
-    const chatContainer = document.querySelector('.chat-container');
-    const micBtn = document.getElementById('mic-btn');
 
-    let currentMode = 'text';
+const messages = document.getElementById("messages");
 
-    function selectMode(mode) {
-        currentMode = mode;
-        
-        // Hide overlay
-        modeOverlay.style.opacity = '0';
-        modeOverlay.style.visibility = 'hidden';
-        
-        // Show chat
-        chatContainer.classList.add('visible');
+// 📊 Stored data
+const marks = localStorage.getItem("marks") || "Not provided";
+const scores = localStorage.getItem("scores") || "Not provided";
+const stream = localStorage.getItem("topStream") || "Not decided";
 
-        // Initial response based on mode
-        if (mode === 'talk') {
-            micBtn.classList.add('active');
-            userInput.placeholder = "Say something to your AI mentor...";
-            appendMessage("Voice mode activated. I'm listening. How can I help you today?", 'ai-message');
-        } else {
-            micBtn.classList.remove('active');
-            userInput.placeholder = "Type your academic query here...";
-            appendMessage("Text mode activated. How may I assist you with your studies?", 'ai-message');
-        }
-    }
+const context = `
+Marks: ${marks}
+Scores: ${scores}
+Stream: ${stream}
+`;
 
-    function toggleMic() {
-        // Voice recognition simulation
-        const btn = document.getElementById('mic-btn');
-        btn.classList.toggle('active-mic');
-        
-        if (btn.classList.contains('active-mic')) {
-            btn.style.background = '#FF8C00';
-            btn.style.color = '#fff';
-            btn.innerText = '🔴';
-            userInput.placeholder = "Listening...";
-        } else {
-            btn.style.background = '#f0f0f0';
-            btn.style.color = '#FF8C00';
-            btn.innerText = '🎙️';
-            userInput.placeholder = currentMode === 'talk' ? "Say something..." : "Type something...";
-        }
-    }
+// 👋 Welcome
+addMsg("Hey! I'm Pathfindr AI 🤖\nAsk me anything about your career, streams, or confusion — I'm here for you.", "ai");
 
-    function handleKey(e) {
-        if (e.key === 'Enter') sendMessage();
-    }
+// ➕ Add message
+function addMsg(text, type){
+  const div = document.createElement("div");
+  div.className = "msg " + type;
+  div.innerText = text;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
 
-    function sendMessage() {
-        const text = userInput.value.trim();
-        if (!text) return;
+// 🚀 Send message
+async function send(){
+  const input = document.getElementById("input");
+  const text = input.value.trim();
+  if(!text) return;
 
-        // User Message
-        appendMessage(text, 'user-message');
-        userInput.value = '';
+  addMsg(text,"user");
+  input.value = "";
 
-        // AI Response (Formal/Polite Simulation)
-        setTimeout(() => {
-            const aiResponse = "I have received your query. Please allow me a moment to provide a detailed and formal explanation regarding this topic.";
-            appendMessage(aiResponse, 'ai-message');
-        }, 800);
-    }
+  const loading = document.createElement("div");
+  loading.className = "msg ai";
+  loading.innerText = "Thinking...";
+  messages.appendChild(loading);
 
-    function appendMessage(text, className) {
-        const msgDiv = document.createElement('div');
-        msgDiv.className = `message ${className}`;
-        msgDiv.innerText = text;
-        chatBox.appendChild(msgDiv);
-        chatBox.scrollTop = chatBox.scrollHeight;
-    }
+  try {
+    const res = await fetch("http://127.0.0.1:3000/chat", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        message:text,
+        context:context
+      })
+    });
+
+    const data = await res.json();
+
+    messages.removeChild(loading);
+    addMsg(data.reply,"ai");
+
+  } catch(err){
+    messages.removeChild(loading);
+    addMsg("Connection error ❌ Check server", "ai");
+  }
+}
+
+// ⌨️ Enter key
+function handleKey(e){
+  if(e.key==="Enter") send();
+}
+
+// 🎯 Navigate
+function goToQuiz(){
+  window.location.href = "quiz.html";
+}
+
 </script>
 
 </body>
