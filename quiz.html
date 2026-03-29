@@ -1,18 +1,1111 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <!-- This makes the site look correct on mobile phones -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pathfindr</title>
-  <!-- Link to our shared stylesheet -->
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pathfindr — Personality Quiz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,500&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --p-light:   #F7EDD4;
+      --p-mid:     #E8D090;
+      --p-warm:    #D4A843;
+      --p-deep:    #B8842A;
+      --p-darker:  #8B5E1A;
+      --ink:       #1E0E00;
+      --ink-soft:  #4A2800;
+      --ink-faint: rgba(60,25,0,0.4);
+      --shadow:    rgba(80,30,0,0.22);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body {
+      min-height:100vh;
+      font-family:'Crimson Pro',serif;
+      color:var(--ink);
+      background-color:#E8D090;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E"),
+        radial-gradient(ellipse at 60% 20%, #FBF3DE 0%, #F0DFA0 30%, #D4A843 70%, #9A6818 100%);
+    }
+
+    /* NAV */
+    .nav {
+      position:sticky; top:0; z-index:200;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:13px 28px;
+      background:rgba(232,208,144,0.82);
+      backdrop-filter:blur(16px);
+      border-bottom:1px solid rgba(139,80,10,0.2);
+    }
+    .nav-logo { font-family:'Playfair Display',serif; font-size:1.3rem; color:var(--ink); }
+    .nav-logo span { color:var(--p-darker); }
+    .nav-step { font-size:.75rem; color:var(--ink-faint); font-style:italic; }
+
+    /* SCREENS — hidden by default, JS shows the right one */
+    .screen { display:none; }
+    .screen.active { display:block; }
+
+    /* PAGE */
+    .page { max-width:680px; margin:0 auto; padding:40px 20px 100px; }
+
+    /* ── INTRO ── */
+    #introScreen.active {
+      display:flex; flex-direction:column; align-items:center; text-align:center;
+    }
+    .intro-badge {
+      background:linear-gradient(135deg,var(--p-deep),var(--p-darker));
+      color:var(--p-light); font-size:.68rem; letter-spacing:2px;
+      text-transform:uppercase; padding:6px 20px; border-radius:50px;
+      margin-bottom:24px; box-shadow:0 4px 14px var(--shadow);
+    }
+    .intro-title {
+      font-family:'Playfair Display',serif;
+      font-size:clamp(2rem,5vw,3rem); line-height:1.15; color:var(--ink);
+      margin-bottom:14px;
+    }
+    .intro-title em { font-style:italic; color:var(--p-darker); }
+    .intro-sub {
+      font-size:1.05rem; color:var(--ink-soft); line-height:1.7;
+      max-width:480px; margin-bottom:28px;
+    }
+    .personalize-box {
+      width:100%; max-width:480px;
+      background:rgba(255,255,255,0.38);
+      border:1px solid rgba(139,80,10,0.2);
+      border-radius:14px; padding:16px 18px;
+      margin-bottom:28px; text-align:left;
+    }
+    .personalize-box h4 {
+      font-family:'Playfair Display',serif; font-size:.9rem; color:var(--ink);
+      margin-bottom:10px;
+    }
+    .marks-chips { display:flex; flex-wrap:wrap; gap:6px; }
+    .marks-chip {
+      background:rgba(180,130,40,0.15); border:1px solid rgba(180,130,40,0.3);
+      color:var(--ink-soft); font-size:.75rem; padding:3px 11px; border-radius:20px;
+    }
+    .marks-chip strong { color:var(--p-darker); }
+    .legend {
+      display:flex; gap:14px; flex-wrap:wrap; justify-content:center;
+      margin-bottom:32px;
+    }
+    .legend-item { display:flex; align-items:center; gap:6px; font-size:.78rem; color:var(--ink-soft); }
+    .legend-dot { width:10px; height:10px; border-radius:50%; }
+    .legend-dot.l { background:#7BA7D4; }
+    .legend-dot.c { background:#B07FD4; }
+    .legend-dot.a { background:#5BAA7A; }
+    .start-btn {
+      background:linear-gradient(135deg,var(--p-deep),var(--p-darker));
+      color:var(--p-light); border:none; border-radius:50px;
+      padding:16px 52px; font-size:1.1rem;
+      font-family:'Crimson Pro',serif; font-weight:600;
+      cursor:pointer; box-shadow:0 6px 24px var(--shadow);
+      transition:transform .2s,box-shadow .2s; letter-spacing:.5px;
+    }
+    .start-btn:hover { transform:translateY(-3px); box-shadow:0 10px 32px rgba(80,30,0,.35); }
+
+    /* ── QUIZ ── */
+    .progress-wrap { margin-bottom:24px; }
+    .progress-meta { display:flex; justify-content:space-between; margin-bottom:7px; }
+    .progress-label { font-size:.72rem; color:var(--ink-faint); text-transform:uppercase; letter-spacing:1.5px; }
+    .progress-count { font-size:.8rem; font-weight:600; color:var(--p-darker); }
+    .prog-bg { height:6px; background:rgba(139,94,26,.15); border-radius:3px; overflow:hidden; }
+    .prog-fill {
+      height:100%;
+      background:linear-gradient(90deg,var(--p-warm),var(--p-deep));
+      border-radius:3px; transition:width .5s ease;
+    }
+
+    .cat-tag {
+      display:inline-flex; align-items:center; gap:6px;
+      font-size:.65rem; text-transform:uppercase; letter-spacing:2px;
+      padding:4px 12px; border-radius:20px; margin-bottom:12px;
+    }
+    .cat-tag.logical    { background:rgba(45,74,122,.1);  color:#3D6A9E; border:1px solid rgba(45,74,122,.22); }
+    .cat-tag.creative   { background:rgba(100,50,150,.1); color:#7A4A9E; border:1px solid rgba(100,50,150,.22); }
+    .cat-tag.analytical { background:rgba(15,58,32,.1);   color:#2A7A4A; border:1px solid rgba(15,58,32,.22); }
+    .cat-dot { width:6px; height:6px; border-radius:50%; }
+    .logical .cat-dot    { background:#5B8FC4; }
+    .creative .cat-dot   { background:#9B7BC4; }
+    .analytical .cat-dot { background:#5BAA7A; }
+
+    .q-card {
+      background:rgba(251,243,222,0.75);
+      border:1px solid rgba(180,130,40,.22);
+      border-radius:16px; padding:26px 24px 20px;
+      margin-bottom:16px;
+      box-shadow:0 4px 20px rgba(80,30,0,.1);
+      backdrop-filter:blur(8px);
+      animation:fadeUp .3s ease;
+    }
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(12px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    .q-num { font-size:.7rem; color:var(--ink-faint); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:9px; }
+    .q-text { font-family:'Playfair Display',serif; font-size:1.1rem; line-height:1.55; color:var(--ink); }
+
+    .options { display:grid; gap:9px; margin-bottom:16px; }
+    .opt {
+      width:100%; text-align:left;
+      display:flex; align-items:flex-start; gap:12px;
+      background:rgba(255,255,255,.52);
+      border:1.5px solid rgba(180,130,40,.18);
+      border-radius:10px; padding:12px 16px;
+      font-family:'Crimson Pro',serif; font-size:.95rem;
+      color:var(--ink-soft); cursor:pointer;
+      transition:background .15s,border-color .15s,transform .15s;
+    }
+    .opt:hover { background:rgba(212,168,67,.12); border-color:rgba(180,130,40,.45); transform:translateX(3px); }
+    .opt.selected { background:rgba(212,168,67,.22); border-color:var(--p-warm); }
+    .opt-letter {
+      flex-shrink:0; width:22px; height:22px; border-radius:50%;
+      background:rgba(180,130,40,.12); border:1px solid rgba(180,130,40,.28);
+      font-size:.72rem; font-weight:600; color:var(--p-darker);
+      display:flex; align-items:center; justify-content:center;
+      transition:background .15s;
+    }
+    .opt.selected .opt-letter { background:var(--p-warm); border-color:var(--p-deep); color:#fff; }
+    .opt-text { flex:1; line-height:1.4; padding-top:2px; }
+
+    .nav-btns { display:flex; gap:10px; }
+    .nbtn {
+      flex:1; padding:13px;
+      border-radius:10px; font-family:'Crimson Pro',serif;
+      font-size:.95rem; font-weight:600; cursor:pointer;
+      transition:transform .15s,box-shadow .15s;
+    }
+    .nbtn.prev {
+      background:rgba(255,255,255,.42);
+      border:1.5px solid rgba(180,130,40,.22); color:var(--ink-soft);
+    }
+    .nbtn.prev:hover { background:rgba(255,255,255,.65); }
+    .nbtn.next {
+      background:linear-gradient(135deg,var(--p-deep),var(--p-darker));
+      border:none; color:var(--p-light);
+      box-shadow:0 4px 14px var(--shadow);
+    }
+    .nbtn.next:hover { transform:translateY(-2px); box-shadow:0 7px 20px rgba(80,30,0,.3); }
+    .nbtn.next:disabled { opacity:.4; cursor:not-allowed; transform:none; box-shadow:none; }
+    .nbtn.finish {
+      background:linear-gradient(135deg,#1A4A1A,#0D2D0D);
+      border:none; color:#B0E4C4;
+      box-shadow:0 4px 14px rgba(10,40,10,.28);
+    }
+    .nbtn.finish:hover { transform:translateY(-2px); }
+    .skip-row { text-align:center; margin-top:10px; }
+    .skip-link { font-size:.78rem; color:var(--ink-faint); cursor:pointer; text-decoration:underline; }
+
+    /* Progress dots */
+    .q-dots {
+      position:fixed; bottom:16px; left:50%; transform:translateX(-50%);
+      display:flex; flex-wrap:wrap; gap:4px; max-width:300px;
+      justify-content:center; padding:7px 14px;
+      background:rgba(232,208,144,.88); backdrop-filter:blur(10px);
+      border:1px solid rgba(139,80,10,.18); border-radius:50px;
+      z-index:50;
+    }
+    .qdot {
+      width:7px; height:7px; border-radius:50%;
+      background:rgba(139,94,26,.2); cursor:pointer;
+      transition:background .2s;
+    }
+    .qdot.done    { background:var(--p-warm); }
+    .qdot.current { background:var(--p-darker); box-shadow:0 0 0 2px rgba(139,80,10,.3); }
+
+    /* ── RESULTS ── */
+    .results-hero { text-align:center; margin-bottom:32px; }
+    .res-label { font-size:.7rem; text-transform:uppercase; letter-spacing:2.5px; color:var(--ink-faint); margin-bottom:10px; }
+    .res-emoji { font-size:3rem; display:block; margin:10px 0; }
+    .res-tag { font-family:'Playfair Display',serif; font-size:clamp(2rem,5vw,2.8rem); line-height:1.1; color:var(--ink); }
+    .res-tag em { font-style:italic; color:var(--p-darker); }
+    .res-desc { font-size:1rem; color:var(--ink-soft); line-height:1.75; max-width:500px; margin:14px auto 0; }
+
+    .score-box {
+      background:rgba(251,243,222,.7); border:1px solid rgba(180,130,40,.2);
+      border-radius:16px; padding:20px 22px; margin-bottom:16px;
+      box-shadow:0 3px 16px rgba(80,30,0,.08);
+    }
+    .score-box h3 { font-family:'Playfair Display',serif; font-size:1rem; color:var(--ink); margin-bottom:16px; }
+    .bar-row { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+    .bar-row:last-child { margin-bottom:0; }
+    .bar-label { width:85px; font-size:.82rem; color:var(--ink-soft); font-weight:600; }
+    .bar-bg { flex:1; height:10px; background:rgba(139,94,26,.12); border-radius:5px; overflow:hidden; }
+    .bar-fill { height:100%; border-radius:5px; width:0; transition:width 1s ease .2s; }
+    .bar-fill.l { background:linear-gradient(90deg,#5B8FC4,#2D4A7A); }
+    .bar-fill.c { background:linear-gradient(90deg,#9B7BC4,#4A1F6A); }
+    .bar-fill.a { background:linear-gradient(90deg,#5BAA7A,#0F3A20); }
+    .bar-pct { width:34px; text-align:right; font-size:.8rem; font-weight:600; color:var(--p-darker); }
+
+    .traits-wrap { display:flex; flex-wrap:wrap; gap:7px; }
+    .trait { background:rgba(212,168,67,.14); border:1px solid rgba(180,130,40,.25);
+      color:var(--ink-soft); padding:5px 13px; border-radius:20px; font-size:.8rem; }
+
+    .stream-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(175px,1fr)); gap:10px; }
+    .stream-card {
+      border-radius:10px; padding:15px 13px; text-align:center;
+      border:1px solid; transition:transform .2s;
+    }
+    .stream-card:hover { transform:translateY(-3px); }
+    .stream-card.s { background:#1A2E4A; border-color:rgba(123,167,212,.35); }
+    .stream-card.a { background:#2A1840; border-color:rgba(155,123,196,.35); }
+    .stream-card.c { background:#0F2E1A; border-color:rgba(91,170,122,.35); }
+    .stream-emoji { font-size:1.5rem; display:block; margin-bottom:5px; }
+    .stream-name { font-family:'Playfair Display',serif; font-size:.92rem; margin-bottom:3px; }
+    .stream-card.s .stream-name { color:#A8C8E8; }
+    .stream-card.a .stream-name { color:#C4A8E0; }
+    .stream-card.c .stream-name { color:#8ECFAA; }
+    .stream-why { font-size:.7rem; opacity:.55; line-height:1.4; }
+    .stream-card.s .stream-why { color:#A8C8E8; }
+    .stream-card.a .stream-why { color:#C4A8E0; }
+    .stream-card.c .stream-why { color:#8ECFAA; }
+    .stream-pct {
+      display:inline-block; margin-top:7px; padding:2px 9px;
+      border-radius:20px; font-size:.68rem; font-weight:600;
+    }
+    .stream-card.s .stream-pct { background:rgba(123,167,212,.15); color:#A8C8E8; }
+    .stream-card.a .stream-pct { background:rgba(155,123,196,.15); color:#C4A8E0; }
+    .stream-card.c .stream-pct { background:rgba(91,170,122,.15);  color:#8ECFAA; }
+
+    .apt-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:9px; }
+    .apt-card {
+      background:rgba(251,243,222,.65); border:1px solid rgba(180,130,40,.18);
+      border-radius:10px; padding:13px 10px; text-align:center;
+    }
+    .apt-emoji { font-size:1.3rem; display:block; margin-bottom:4px; }
+    .apt-subj { font-size:.68rem; color:var(--ink-faint); text-transform:uppercase; letter-spacing:1px; }
+    .apt-val { font-family:'Playfair Display',serif; font-size:1.15rem; color:var(--ink); }
+
+    .res-cta { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:24px; }
+    .cta {
+      padding:12px 26px; border-radius:50px;
+      font-family:'Crimson Pro',serif; font-size:.95rem; font-weight:600;
+      cursor:pointer; transition:transform .18s,box-shadow .18s;
+    }
+    .cta.primary {
+      background:linear-gradient(135deg,var(--p-deep),var(--p-darker));
+      color:var(--p-light); border:none;
+      box-shadow:0 5px 18px var(--shadow);
+    }
+    .cta.primary:hover { transform:translateY(-2px); box-shadow:0 9px 24px rgba(80,30,0,.35); }
+    .cta.secondary {
+      background:rgba(255,255,255,.42); border:1.5px solid rgba(180,130,40,.28); color:var(--ink-soft);
+    }
+    .cta.secondary:hover { background:rgba(255,255,255,.62); transform:translateY(-1px); }
+
+    @media(max-width:480px){
+      .page { padding:24px 14px 110px; }
+      .q-card { padding:18px 14px; }
+      .apt-grid { grid-template-columns:repeat(2,1fr); }
+      .q-dots { display:none; }
+    }
+  </style>
 </head>
 <body>
 
-  <h1>Take the Quiz</h1>
+<nav class="nav">
+  <div class="nav-logo">Path<span>findr</span></div>
+  <div class="nav-step">Phase 5 — Personality &amp; Aptitude</div>
+</nav>
 
-  <!-- Link to our shared JavaScript file -->
-  <script src="app.js"></script>
+<div class="page">
+
+  <!-- ════════════ INTRO SCREEN ════════════ -->
+  <div id="introScreen" class="screen">
+    <div class="intro-badge">Phase 5 of 7 · ~8 minutes · 40 Questions</div>
+    <h1 class="intro-title">Discover Your<br/><em>True Aptitude</em></h1>
+    <p class="intro-sub">
+      40 questions across three thinking styles — Logical, Creative, and Analytical.
+      Personalised from your subject marks. No right or wrong answers, just honest ones.
+    </p>
+
+    <div class="personalize-box">
+      <h4>✦ Personalised from your marks</h4>
+      <div class="marks-chips" id="marksChips"></div>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot l"></div>Logical Thinking (14 Qs)</div>
+      <div class="legend-item"><div class="legend-dot c"></div>Creative Instinct (13 Qs)</div>
+      <div class="legend-item"><div class="legend-dot a"></div>Analytical Depth (13 Qs)</div>
+    </div>
+
+    <button class="start-btn" id="startBtn">Begin Quiz →</button>
+  </div>
+
+  <!-- ════════════ QUIZ SCREEN ════════════ -->
+  <div id="quizScreen" class="screen">
+    <div class="progress-wrap">
+      <div class="progress-meta">
+        <span class="progress-label">Progress</span>
+        <span class="progress-count" id="progCount">1 / 40</span>
+      </div>
+      <div class="prog-bg"><div class="prog-fill" id="progFill" style="width:2.5%"></div></div>
+    </div>
+
+    <div id="catTag" class="cat-tag logical">
+      <div class="cat-dot"></div>
+      <span id="catLabel">Logical Thinking</span>
+    </div>
+
+    <div class="q-card" id="qCard">
+      <div class="q-num" id="qNum">Question 1 of 40</div>
+      <div class="q-text" id="qText"></div>
+    </div>
+
+    <div class="options" id="optGrid"></div>
+
+    <div class="nav-btns">
+      <button class="nbtn prev" id="prevBtn">← Back</button>
+      <button class="nbtn next" id="nextBtn" disabled>Next →</button>
+    </div>
+    <div class="skip-row">
+      <span class="skip-link" id="skipLink">Skip this question</span>
+    </div>
+  </div>
+
+  <!-- ════════════ RESULTS SCREEN ════════════ -->
+  <div id="resultsScreen" class="screen">
+    <div class="results-hero">
+      <div class="res-label">Your Personality Type</div>
+      <span class="res-emoji" id="resEmoji"></span>
+      <div class="res-tag" id="resTag"></div>
+      <p class="res-desc" id="resDesc"></p>
+    </div>
+
+    <div class="score-box">
+      <h3>Dimension Scores</h3>
+      <div class="bar-row">
+        <span class="bar-label">Logical</span>
+        <div class="bar-bg"><div class="bar-fill l" id="lBar"></div></div>
+        <span class="bar-pct" id="lPct">0%</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label">Creative</span>
+        <div class="bar-bg"><div class="bar-fill c" id="cBar"></div></div>
+        <span class="bar-pct" id="cPct">0%</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label">Analytical</span>
+        <div class="bar-bg"><div class="bar-fill a" id="aBar"></div></div>
+        <span class="bar-pct" id="aPct">0%</span>
+      </div>
+    </div>
+
+    <div class="score-box">
+      <h3>Your Key Traits</h3>
+      <div class="traits-wrap" id="traitsWrap"></div>
+    </div>
+
+    <div class="score-box">
+      <h3>Subject Aptitude</h3>
+      <div class="apt-grid" id="aptGrid"></div>
+    </div>
+
+    <div class="score-box">
+      <h3>Recommended Streams</h3>
+      <div class="stream-grid" id="streamGrid"></div>
+    </div>
+
+    <div class="res-cta">
+      <button class="cta primary" onclick="location.href='claude-chat.html'">Talk to Claude AI →</button>
+      <button class="cta secondary" id="retakeBtn">Retake Quiz</button>
+      <button class="cta secondary" onclick="location.href='index.html'">Explore Careers</button>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<!-- Floating dots (shown only during quiz) -->
+<div class="q-dots" id="qDots" style="display:none;"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+//  SCREEN MANAGER
+// ══════════════════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ══════════════════════════════════════════════════════════════
+//  MARKS FROM localStorage
+// ══════════════════════════════════════════════════════════════
+const SUBJECTS = ['Hindi','English','Math','Science','Social','Computer'];
+let marks = { Hindi:60, English:65, Math:58, Science:62, Social:70, Computer:55 };
+try {
+  const s = JSON.parse(localStorage.getItem('pathfindr_marks') || '{}');
+  SUBJECTS.forEach(k => { if (typeof s[k] === 'number') marks[k] = s[k]; });
+} catch(e) {}
+
+const isMathStrong = marks.Math    >= 75;
+const isSciStrong  = marks.Science >= 75;
+const isEngStrong  = marks.English >= 75;
+const isMathWeak   = marks.Math    <  50;
+
+// Populate marks chips on intro
+(function() {
+  const el = document.getElementById('marksChips');
+  SUBJECTS.forEach(s => {
+    const chip = document.createElement('span');
+    chip.className = 'marks-chip';
+    chip.innerHTML = `${s}: <strong>${marks[s]}</strong>`;
+    el.appendChild(chip);
+  });
+})();
+
+// ══════════════════════════════════════════════════════════════
+//  QUESTION BANK — 40 questions
+// ══════════════════════════════════════════════════════════════
+const QUESTIONS = [
+  // ── LOGICAL (14) ─────────────────────────────────────
+  { id:1, cat:'logical',
+    text:'If you have to solve a completely new problem you have never seen before, what is your first instinct?',
+    opts:[
+      { t:'Break it into smaller, clearly defined steps',              l:3,c:0,a:1 },
+      { t:'Look for a pattern or something similar I have seen before',l:1,c:0,a:3 },
+      { t:'Brainstorm freely — let ideas come without a filter first', l:0,c:3,a:0 },
+      { t:'Research what others have done in similar situations',       l:1,c:1,a:2 },
+    ]
+  },
+  { id:2, cat:'logical',
+    text:'You are building an exam schedule. How do you decide what to study first?',
+    opts:[
+      { t:'The subject with the lowest marks — fix weaknesses first',  l:3,c:0,a:1 },
+      { t:'The subject I enjoy most — momentum matters',               l:0,c:2,a:0 },
+      { t:'Based on which exam is nearest — priority by deadline',     l:2,c:0,a:3 },
+      { t:'Alternate subjects to keep things interesting',             l:0,c:1,a:1 },
+    ]
+  },
+  { id:3, cat:'logical',
+    text:'A classmate gives you a wrong answer but their method seems logical. What do you do?',
+    opts:[
+      { t:'Carefully trace each step to find where the logic breaks',  l:3,c:0,a:2 },
+      { t:'Try the problem fresh from scratch my own way',             l:2,c:1,a:1 },
+      { t:'Accept it might be right — I could be wrong',               l:0,c:0,a:0 },
+      { t:'Ask the teacher without wasting time on it',                l:1,c:0,a:1 },
+    ]
+  },
+  { id:4, cat:'logical',
+    text:'Which of these activities do you genuinely enjoy the most?',
+    opts:[
+      { t:'Solving puzzles or brain teasers',                          l:3,c:1,a:1 },
+      { t:'Writing stories or creating art',                           l:0,c:3,a:0 },
+      { t:'Researching a topic and reading deeply about it',           l:1,c:0,a:3 },
+      { t:'Organising events or managing people',                      l:1,c:1,a:2 },
+    ]
+  },
+  { id:5, cat:'logical',
+    text:'If two of your close friends have an argument, you naturally:',
+    opts:[
+      { t:'Try to find who is factually correct',                      l:3,c:0,a:2 },
+      { t:'See both perspectives and try to make peace',               l:0,c:1,a:2 },
+      { t:'Think of a creative middle-ground solution',                l:0,c:3,a:1 },
+      { t:'Stay out of it — it is their business',                     l:1,c:0,a:0 },
+    ]
+  },
+  { id:6, cat:'logical',
+    text:'You are given a 100-piece jigsaw puzzle. How do you approach it?',
+    opts:[
+      { t:'Sort by colour/shape first, then systematically fill sections', l:3,c:0,a:2 },
+      { t:'Dive in randomly — I enjoy the unpredictability',              l:0,c:2,a:0 },
+      { t:'Study the picture carefully first, then recreate it precisely', l:1,c:1,a:3 },
+      { t:'Do the border first — that is the obvious starting point',      l:2,c:0,a:1 },
+    ]
+  },
+  { id:7, cat:'logical',
+    text:'In a group project, which role do you naturally fall into?',
+    opts:[
+      { t:'The planner — I create the structure and timeline',         l:3,c:0,a:2 },
+      { t:'The idea generator — I pitch the most creative concepts',   l:0,c:3,a:0 },
+      { t:'The researcher — I gather all the information needed',      l:1,c:0,a:3 },
+      { t:'The presenter — I communicate the work to the audience',    l:0,c:2,a:1 },
+    ]
+  },
+  { id:8, cat:'logical',
+    text:'How do you feel about rules and procedures?',
+    opts:[
+      { t:'They exist for a reason — I follow them carefully',         l:3,c:0,a:2 },
+      { t:'They are guidelines, not absolute — I adapt them',          l:1,c:3,a:1 },
+      { t:'I question them — rules should be backed by evidence',      l:2,c:1,a:3 },
+      { t:'I ignore them if they slow down what I want to achieve',    l:0,c:2,a:0 },
+    ]
+  },
+  { id:9, cat:'logical',
+    text: isMathStrong
+      ? 'Math is one of your strengths — when you finish a complex equation, what gives you satisfaction?'
+      : 'When working through a difficult problem, what gives you the most satisfaction?',
+    opts:[
+      { t:'The clean final answer after following every step correctly', l:3,c:0,a:2 },
+      { t:'Discovering a shortcut no one showed me',                   l:2,c:2,a:1 },
+      { t:'Understanding WHY the method works, not just HOW',          l:1,c:0,a:3 },
+      { t:'Helping someone else understand it afterwards',             l:0,c:1,a:2 },
+    ]
+  },
+  { id:10, cat:'logical',
+    text:'If someone gives you directions to a new place, you prefer:',
+    opts:[
+      { t:'Turn-by-turn verbal instructions',                          l:2,c:0,a:1 },
+      { t:'A hand-drawn map or sketch',                                l:1,c:2,a:1 },
+      { t:'GPS with the full route visible on screen',                 l:1,c:0,a:3 },
+      { t:'Just the destination — I will figure it out',               l:3,c:1,a:0 },
+    ]
+  },
+  { id:11, cat:'logical',
+    text:'Your phone runs out of storage. You have to delete things. You:',
+    opts:[
+      { t:'Delete the apps that take the most space first',            l:3,c:0,a:3 },
+      { t:'Randomly delete things I barely remember downloading',      l:0,c:1,a:0 },
+      { t:'Move everything to the cloud first, then decide',           l:2,c:0,a:2 },
+      { t:'Keep everything — I will buy more storage',                 l:0,c:2,a:0 },
+    ]
+  },
+  { id:12, cat:'logical',
+    text:'Which subject most closely mirrors how you naturally think?',
+    opts:[
+      { t:'Mathematics — precise, step-by-step, one right answer',    l:3,c:0,a:1 },
+      { t:'Literature — interpretive, layered, many valid readings',   l:0,c:3,a:1 },
+      { t:'History — connecting events, causes, consequences over time',l:1,c:1,a:3 },
+      { t:'Science — hypothesis, experiment, data, conclusion',        l:2,c:0,a:3 },
+    ]
+  },
+  { id:13, cat:'logical',
+    text:'You need to memorise a lot of information for an exam. You:',
+    opts:[
+      { t:'Create a mind map or flowchart to connect ideas',           l:2,c:1,a:3 },
+      { t:'Make it into a story or song to remember',                  l:0,c:3,a:0 },
+      { t:'Write it out repeatedly until it sticks',                   l:3,c:0,a:1 },
+      { t:'Test yourself with flashcards or quizzes',                  l:2,c:0,a:2 },
+    ]
+  },
+  { id:14, cat:'logical',
+    text:'At a chess board with no opponent, you would:',
+    opts:[
+      { t:'Study famous games and memorise openings',                  l:2,c:0,a:3 },
+      { t:'Invent my own unusual opening strategies',                  l:1,c:3,a:1 },
+      { t:'Practise specific endgame scenarios methodically',          l:3,c:0,a:2 },
+      { t:'Not bother — I prefer games that involve more people',      l:0,c:1,a:0 },
+    ]
+  },
+
+  // ── CREATIVE (13) ────────────────────────────────────
+  { id:15, cat:'creative',
+    text:'You have a free afternoon with no plans. What do you naturally gravitate toward?',
+    opts:[
+      { t:'Making something — sketching, writing, cooking, music',     l:0,c:3,a:0 },
+      { t:'Learning something new I have been curious about',          l:1,c:1,a:2 },
+      { t:'Watching, reading, or listening to something I enjoy',      l:0,c:2,a:1 },
+      { t:'Planning something upcoming or organising my space',        l:2,c:0,a:2 },
+    ]
+  },
+  { id:16, cat:'creative',
+    text:'When you write an essay, what matters most to you?',
+    opts:[
+      { t:'A compelling opening line that immediately grabs attention', l:0,c:3,a:1 },
+      { t:'A clear, well-structured argument from start to finish',    l:3,c:0,a:2 },
+      { t:'Rich examples and evidence to back every point',            l:1,c:0,a:3 },
+      { t:'That it sounds natural, not robotic or formal',             l:0,c:2,a:1 },
+    ]
+  },
+  { id:17, cat:'creative',
+    text: isEngStrong
+      ? 'You clearly enjoy language — if asked to describe your city in three words, you would choose words that are:'
+      : 'If asked to describe your city in three words, you would choose words that are:',
+    opts:[
+      { t:'Precise and literal — exactly what the place is like',      l:2,c:0,a:2 },
+      { t:'Poetic and evocative — capturing the feeling',              l:0,c:3,a:0 },
+      { t:'Statistical — population, growth rate, economy',            l:1,c:0,a:3 },
+      { t:'Culturally loaded — referencing history and tradition',     l:1,c:2,a:2 },
+    ]
+  },
+  { id:18, cat:'creative',
+    text:'You are redesigning your school timetable. What do you consider first?',
+    opts:[
+      { t:'Which subjects benefit from morning vs afternoon focus',    l:2,c:1,a:3 },
+      { t:'Making it visually beautiful and easy to glance at',        l:0,c:3,a:0 },
+      { t:'Fitting in enough breaks so students stay energised',       l:1,c:2,a:1 },
+      { t:'Strict fairness — every subject gets exactly equal time',   l:3,c:0,a:2 },
+    ]
+  },
+  { id:19, cat:'creative',
+    text:'If you could add one new class to school that does not exist yet, it would be:',
+    opts:[
+      { t:'Applied Problem Solving — real-world puzzles every day',    l:3,c:1,a:2 },
+      { t:'Creative Expression — art, music, film, writing',           l:0,c:3,a:0 },
+      { t:'Philosophy & Ethics — how to think about big questions',    l:1,c:2,a:2 },
+      { t:'Data & Statistics — making sense of the world with numbers',l:2,c:0,a:3 },
+    ]
+  },
+  { id:20, cat:'creative',
+    text:'How do you react when a plan changes unexpectedly at the last minute?',
+    opts:[
+      { t:'I adapt quickly — change is an opportunity to improvise',   l:0,c:3,a:0 },
+      { t:'I assess the new situation and make a revised plan fast',   l:3,c:0,a:2 },
+      { t:'I feel frustrated but work through it systematically',      l:2,c:0,a:2 },
+      { t:'I let the situation unfold and react as things develop',    l:0,c:2,a:1 },
+    ]
+  },
+  { id:21, cat:'creative',
+    text:'Which of these would you find most satisfying to create?',
+    opts:[
+      { t:'A mobile app that solves a real daily inconvenience',       l:3,c:1,a:2 },
+      { t:'A short film or illustrated story that moves people',       l:0,c:3,a:0 },
+      { t:'A detailed research report revealing something surprising', l:1,c:0,a:3 },
+      { t:'A campaign that changes how people think about an issue',   l:0,c:2,a:2 },
+    ]
+  },
+  { id:22, cat:'creative',
+    text:'When you look at a blank page or empty canvas, you feel:',
+    opts:[
+      { t:'Excited — all those possibilities!',                        l:0,c:3,a:0 },
+      { t:'A little anxious — I need a clear starting structure',      l:3,c:0,a:1 },
+      { t:'Curious — what is the right first move here?',              l:2,c:1,a:2 },
+      { t:'Calm — I will figure out what to put there as I go',        l:0,c:2,a:1 },
+    ]
+  },
+  { id:23, cat:'creative',
+    text:'Your favourite kind of story or film is one that:',
+    opts:[
+      { t:'Has an intricate plot with surprising twists that all make sense', l:3,c:1,a:2 },
+      { t:'Is visually or emotionally stunning, even with a simple plot',     l:0,c:3,a:0 },
+      { t:'Is based on real events — I like learning from what actually happened', l:1,c:0,a:3 },
+      { t:'Has a deep character who changes meaningfully by the end',         l:0,c:2,a:2 },
+    ]
+  },
+  { id:24, cat:'creative',
+    text:'If you could visit anywhere in the world tomorrow, you would choose:',
+    opts:[
+      { t:'A place full of ancient history and archaeological sites',  l:1,c:2,a:3 },
+      { t:'A vibrant city buzzing with arts, culture, and street life',l:0,c:3,a:0 },
+      { t:'A research facility or science centre doing cutting-edge work',l:2,c:0,a:3 },
+      { t:'Somewhere completely remote and unpredictable — an adventure',l:0,c:2,a:0 },
+    ]
+  },
+  { id:25, cat:'creative',
+    text:'How do you prefer to explain a new idea to someone?',
+    opts:[
+      { t:'With a clear analogy or metaphor that makes it click instantly', l:1,c:3,a:1 },
+      { t:'Step by step, from the basics up',                          l:3,c:0,a:2 },
+      { t:'With data, examples, and evidence',                         l:1,c:0,a:3 },
+      { t:'I ask them questions so they arrive at the idea themselves', l:2,c:2,a:2 },
+    ]
+  },
+  { id:26, cat:'creative',
+    text:'Which colour best describes how your mind works?',
+    opts:[
+      { t:'Blue — calm, precise, structured',                          l:3,c:0,a:1 },
+      { t:'Orange — energetic, spontaneous, expressive',               l:0,c:3,a:0 },
+      { t:'Green — patient, methodical, growth-oriented',              l:1,c:1,a:3 },
+      { t:'Purple — curious, imaginative, questioning everything',     l:1,c:2,a:2 },
+    ]
+  },
+  { id:27, cat:'creative',
+    text:'If you were writing a book, what kind would it be?',
+    opts:[
+      { t:'A thriller with a puzzle the reader solves alongside the hero', l:3,c:1,a:2 },
+      { t:'A lyrical novel exploring what it means to be human',          l:0,c:3,a:1 },
+      { t:'A non-fiction deep-dive into a topic few people understand',   l:1,c:0,a:3 },
+      { t:'A graphic novel blending words and visual art',                l:0,c:3,a:0 },
+    ]
+  },
+
+  // ── ANALYTICAL (13) ──────────────────────────────────
+  { id:28, cat:'analytical',
+    text:'You read two news articles about the same event — one says it was a success, one says it failed. You:',
+    opts:[
+      { t:'Look for the data each article cites and compare them',     l:2,c:0,a:3 },
+      { t:'Consider who wrote each article and what they might gain',  l:1,c:1,a:3 },
+      { t:'Assume the truth is somewhere in the middle',               l:1,c:0,a:1 },
+      { t:'Find a third source with a more neutral perspective',       l:2,c:0,a:2 },
+    ]
+  },
+  { id:29, cat:'analytical',
+    text: isSciStrong
+      ? 'Science is one of your strengths — when you learn a new scientific concept, what do you do next?'
+      : 'When you learn something surprising or counterintuitive, what is your first reaction?',
+    opts:[
+      { t:'Immediately try to apply it to a problem I know',           l:3,c:0,a:2 },
+      { t:'Think about how it connects to other things I already know',l:1,c:1,a:3 },
+      { t:'Look up more to understand the evidence behind it',         l:1,c:0,a:3 },
+      { t:'Share it with someone — discussing it helps me understand', l:0,c:2,a:1 },
+    ]
+  },
+  { id:30, cat:'analytical',
+    text:"You are given a graph showing India's population growth over 50 years. What do you focus on first?",
+    opts:[
+      { t:'The overall trend — is it going up, down, or levelling off?', l:2,c:0,a:3 },
+      { t:'The sharpest peaks or drops — what caused those?',           l:1,c:1,a:3 },
+      { t:"What this means for India's future — projections",           l:2,c:0,a:2 },
+      { t:'How this compares to other countries',                       l:1,c:0,a:2 },
+    ]
+  },
+  { id:31, cat:'analytical',
+    text:'Before making an important decision, you typically:',
+    opts:[
+      { t:'List pros and cons carefully before doing anything',        l:3,c:0,a:3 },
+      { t:'Trust my gut — I have usually thought it through intuitively', l:0,c:2,a:1 },
+      { t:'Talk it through with someone I trust',                      l:0,c:1,a:2 },
+      { t:'Gather as much information as possible, then decide',       l:2,c:0,a:3 },
+    ]
+  },
+  { id:32, cat:'analytical',
+    text:'If the price of petrol goes up, which question interests you most?',
+    opts:[
+      { t:'Why did it go up — what is the root cause?',                l:2,c:0,a:3 },
+      { t:'Who is most affected — which communities suffer most?',     l:0,c:1,a:2 },
+      { t:'What are the downstream effects — what will change next?',  l:1,c:0,a:3 },
+      { t:'What can individuals actually do about it?',                l:2,c:1,a:1 },
+    ]
+  },
+  { id:33, cat:'analytical',
+    text:'You are evaluating two career options. One pays more; the other is more fulfilling. You:',
+    opts:[
+      { t:'Create a weighted scoring system — assign points to each factor', l:3,c:0,a:3 },
+      { t:'Ask myself which I would regret NOT choosing at 40',         l:0,c:2,a:2 },
+      { t:'Research real salaries and real job satisfaction data for both', l:1,c:0,a:3 },
+      { t:'Choose the fulfilling one — money follows passion eventually', l:0,c:3,a:0 },
+    ]
+  },
+  { id:34, cat:'analytical',
+    text:'You notice you always score lower in afternoon exams than morning ones. You:',
+    opts:[
+      { t:'Track it precisely — collect more data over time to confirm it', l:2,c:0,a:3 },
+      { t:'Adjust immediately — more sleep, better lunch, earlier revision', l:3,c:0,a:1 },
+      { t:'Ignore it — one pattern does not mean anything',            l:0,c:0,a:0 },
+      { t:'Research why this happens biologically, then act',          l:1,c:0,a:3 },
+    ]
+  },
+  { id:35, cat:'analytical',
+    text:'When a teacher gives unexpected feedback that your approach was wrong, you feel:',
+    opts:[
+      { t:'Immediately curious — show me exactly where the error was', l:2,c:0,a:3 },
+      { t:'A little upset, but I reflect on it later when calmer',     l:1,c:1,a:2 },
+      { t:'Defensive at first, but willing to reconsider with evidence', l:2,c:0,a:2 },
+      { t:'Fine — being wrong is part of learning',                    l:1,c:2,a:2 },
+    ]
+  },
+  { id:36, cat:'analytical',
+    text:'Which of these would you find most interesting to study for a month?',
+    opts:[
+      { t:'How the human brain processes emotions and decisions',       l:1,c:1,a:3 },
+      { t:'The economics behind why some countries are rich and others poor', l:2,c:0,a:3 },
+      { t:'The history of a single city from its founding to today',   l:0,c:2,a:3 },
+      { t:'How to build a working computer from basic components',     l:3,c:1,a:2 },
+    ]
+  },
+  { id:37, cat:'analytical',
+    text: isMathWeak
+      ? 'When you encounter a topic that feels very abstract and hard to connect to real life, you:'
+      : 'When you encounter a topic that feels abstract and theoretical, you:',
+    opts:[
+      { t:'Look for a real-world example that makes it concrete',      l:2,c:1,a:3 },
+      { t:'Accept the theory first and trust the application will come later', l:2,c:0,a:2 },
+      { t:'Push back — if I cannot see why it matters, I cannot focus',l:0,c:2,a:1 },
+      { t:'Create a visual or diagram to make the abstraction tangible', l:1,c:2,a:2 },
+    ]
+  },
+  { id:38, cat:'analytical',
+    text:'India is deciding where to build a new metro line. You are on the committee. You first ask:',
+    opts:[
+      { t:'Where is congestion worst — show me the traffic data',      l:2,c:0,a:3 },
+      { t:'Which route would connect the most underserved communities?',l:0,c:1,a:2 },
+      { t:'What is the most cost-efficient path given the terrain?',   l:3,c:0,a:3 },
+      { t:'What have other cities done — which models worked?',        l:1,c:0,a:2 },
+    ]
+  },
+  { id:39, cat:'analytical',
+    text:'You receive a complicated instruction manual for a new device. You:',
+    opts:[
+      { t:'Read the whole thing before touching anything',             l:2,c:0,a:3 },
+      { t:'Skip to the section I need right now',                      l:3,c:1,a:1 },
+      { t:'Watch a YouTube video — manuals are never well written',    l:0,c:1,a:0 },
+      { t:'Just figure it out by experimenting with the device',       l:1,c:3,a:1 },
+    ]
+  },
+  { id:40, cat:'analytical',
+    text:'What kind of intelligence do you rely on most in daily life?',
+    opts:[
+      { t:'Mathematical — I naturally think in numbers, patterns, logic', l:3,c:0,a:2 },
+      { t:'Linguistic — words, stories, and communication are my strength', l:0,c:3,a:1 },
+      { t:'Interpersonal — I read people well and navigate social situations', l:0,c:1,a:2 },
+      { t:'Analytical — I break down systems and spot hidden patterns', l:1,c:0,a:3 },
+    ]
+  },
+];
+
+// ══════════════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════════════
+let qi      = 0;        // current question index
+let answers = {};       // { questionId: optionIndex }
+
+// ══════════════════════════════════════════════════════════════
+//  BOOT — show intro
+// ══════════════════════════════════════════════════════════════
+showScreen('introScreen');
+
+document.getElementById('startBtn').addEventListener('click', function() {
+  qi = 0;
+  answers = {};
+  buildDots();
+  showScreen('quizScreen');
+  document.getElementById('qDots').style.display = 'flex';
+  renderQ();
+});
+
+document.getElementById('retakeBtn').addEventListener('click', function() {
+  qi = 0;
+  answers = {};
+  buildDots();
+  showScreen('quizScreen');
+  document.getElementById('qDots').style.display = 'flex';
+  renderQ();
+});
+
+document.getElementById('prevBtn').addEventListener('click', function() {
+  if (qi > 0) { qi--; renderQ(); }
+});
+
+document.getElementById('nextBtn').addEventListener('click', function() {
+  if (qi < QUESTIONS.length - 1) { qi++; renderQ(); }
+  else finishQuiz();
+});
+
+document.getElementById('skipLink').addEventListener('click', function() {
+  if (qi < QUESTIONS.length - 1) { qi++; renderQ(); }
+});
+
+// ══════════════════════════════════════════════════════════════
+//  RENDER QUESTION
+// ══════════════════════════════════════════════════════════════
+function renderQ() {
+  const q     = QUESTIONS[qi];
+  const total = QUESTIONS.length;
+  const LETTERS = ['A','B','C','D'];
+  const CAT_NAMES = { logical:'Logical Thinking', creative:'Creative Instinct', analytical:'Analytical Depth' };
+
+  // Progress
+  document.getElementById('progCount').textContent = `${qi+1} / ${total}`;
+  document.getElementById('progFill').style.width  = `${((qi+1)/total)*100}%`;
+
+  // Category tag
+  const tag = document.getElementById('catTag');
+  tag.className = `cat-tag ${q.cat}`;
+  document.getElementById('catLabel').textContent = CAT_NAMES[q.cat];
+
+  // Question card animation reset
+  const card = document.getElementById('qCard');
+  card.style.animation = 'none';
+  void card.offsetWidth; // force reflow
+  card.style.animation = '';
+
+  document.getElementById('qNum').textContent  = `Question ${qi+1} of ${total}`;
+  document.getElementById('qText').textContent = q.text;
+
+  // Options
+  const grid = document.getElementById('optGrid');
+  grid.innerHTML = '';
+  q.opts.forEach((opt, oi) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt' + (answers[q.id] === oi ? ' selected' : '');
+    btn.innerHTML = `<div class="opt-letter">${LETTERS[oi]}</div><div class="opt-text">${opt.t}</div>`;
+    btn.addEventListener('click', function() {
+      answers[q.id] = oi;
+      // Update selection UI
+      grid.querySelectorAll('.opt').forEach((b,i) => {
+        b.classList.toggle('selected', i === oi);
+        b.querySelector('.opt-letter').style.background = i === oi ? 'var(--p-warm)' : '';
+        b.querySelector('.opt-letter').style.color      = i === oi ? '#fff' : '';
+      });
+      updateNextBtn();
+      updateDots();
+      // Auto-advance
+      if (qi < QUESTIONS.length - 1) {
+        setTimeout(() => { qi++; renderQ(); }, 600);
+      } else {
+        // Last question — enable finish
+        document.getElementById('nextBtn').disabled = false;
+      }
+    });
+    grid.appendChild(btn);
+  });
+
+  // Nav
+  document.getElementById('prevBtn').disabled = qi === 0;
+  updateNextBtn();
+  updateDots();
+
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+function updateNextBtn() {
+  const q      = QUESTIONS[qi];
+  const isLast = qi === QUESTIONS.length - 1;
+  const btn    = document.getElementById('nextBtn');
+  btn.disabled = answers[q.id] === undefined;
+  btn.textContent = isLast ? 'See My Results →' : 'Next →';
+  btn.className   = isLast ? 'nbtn finish' : 'nbtn next';
+}
+
+// ══════════════════════════════════════════════════════════════
+//  DOTS
+// ══════════════════════════════════════════════════════════════
+function buildDots() {
+  const wrap = document.getElementById('qDots');
+  wrap.innerHTML = '';
+  QUESTIONS.forEach((q, i) => {
+    const d = document.createElement('div');
+    d.className = 'qdot';
+    d.id = 'dot'+i;
+    d.addEventListener('click', () => { qi = i; renderQ(); });
+    wrap.appendChild(d);
+  });
+}
+
+function updateDots() {
+  QUESTIONS.forEach((q, i) => {
+    const d = document.getElementById('dot'+i);
+    if (!d) return;
+    d.className = 'qdot';
+    if (i === qi) d.classList.add('current');
+    else if (answers[q.id] !== undefined) d.classList.add('done');
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+//  FINISH & CALCULATE
+// ══════════════════════════════════════════════════════════════
+function finishQuiz() {
+  let lScore = 0, cScore = 0, aScore = 0;
+  let lMax   = 0, cMax   = 0, aMax   = 0;
+
+  QUESTIONS.forEach(q => {
+    // max possible per question = 3 for each dimension
+    lMax += 3; cMax += 3; aMax += 3;
+    const sel = answers[q.id];
+    if (sel !== undefined) {
+      lScore += q.opts[sel].l;
+      cScore += q.opts[sel].c;
+      aScore += q.opts[sel].a;
+    }
+  });
+
+  const pct = {
+    l: Math.round((lScore / lMax) * 100),
+    c: Math.round((cScore / cMax) * 100),
+    a: Math.round((aScore / aMax) * 100),
+  };
+
+  // Determine top two
+  const ranked = [['l',pct.l],['c',pct.c],['a',pct.a]].sort((x,y)=>y[1]-x[1]);
+  const top = ranked[0][0];
+  const sec = ranked[1][0];
+
+  // Save for Phase 6
+  try {
+    localStorage.setItem('pathfindr_quiz', JSON.stringify({
+      scores: pct, top, sec, marks, timestamp: Date.now()
+    }));
+  } catch(e) {}
+
+  showResults(pct, top, sec);
+}
+
+// ══════════════════════════════════════════════════════════════
+//  RESULTS
+// ══════════════════════════════════════════════════════════════
+const PROFILES = {
+  'l-a': { emoji:'🔍', tag:'The <em>Strategist</em>',
+    desc:"You are a precise, methodical thinker who thrives on well-defined problems. Logic and evidence guide every decision you make. Engineering, medicine, data science, and law are natural destinations for a mind like yours.",
+    traits:['Systematic','Evidence-driven','Detail-oriented','Goal-focused','Disciplined','Objective'],
+    streams:[{e:'🔬',n:'Science',t:'s',w:'JEE/NEET built for your mind',m:92},{e:'📈',n:'Commerce',t:'c',w:'CA and Economics reward precision',m:76},{e:'⚖️',n:'Arts / Law',t:'a',w:'Legal reasoning needs this exactness',m:68}]
+  },
+  'l-c': { emoji:'💡', tag:'The <em>Inventor</em>',
+    desc:"You combine structured thinking with creative sparks — making you exceptional at designing solutions nobody else has thought of. Technology, architecture, and product design are where you will do your best work.",
+    traits:['Innovative','Methodical','Pattern-seeker','Curious','Resourceful','Adaptable'],
+    streams:[{e:'🔬',n:'Science',t:'s',w:'Engineering needs creative logic',m:88},{e:'🎨',n:'Arts',t:'a',w:'Design thinking rewards your blend',m:80},{e:'📈',n:'Commerce',t:'c',w:'Marketing and entrepreneurship fit',m:70}]
+  },
+  'c-l': { emoji:'🎭', tag:'The <em>Visionary</em>',
+    desc:"Your creativity takes the lead but is grounded by logic — a rare combination. You see the world as it could be. Design, journalism, film, and the creative-tech industry are where you will shine.",
+    traits:['Original','Expressive','Big-picture','Resourceful','Empathetic','Bold'],
+    streams:[{e:'🎨',n:'Arts',t:'a',w:'Your creative instinct shines here',m:90},{e:'📱',n:'Commerce',t:'c',w:'Marketing and media love this profile',m:75},{e:'🏛️',n:'Science',t:'s',w:'Architecture blends both sides',m:72}]
+  },
+  'c-a': { emoji:'🌊', tag:'The <em>Storyteller</em>',
+    desc:"You blend vivid imagination with a deep love of understanding how the world actually works. Journalism, psychology, social sciences, and documentary film are where you will do meaningful work.",
+    traits:['Empathetic','Curious','Nuanced','Expressive','Insightful','Reflective'],
+    streams:[{e:'🎨',n:'Arts',t:'a',w:'Psychology and journalism fit perfectly',m:91},{e:'📉',n:'Commerce',t:'c',w:'Behavioural economics suits you',m:70},{e:'🧪',n:'Science',t:'s',w:'Social research crosses into science',m:62}]
+  },
+  'a-l': { emoji:'📐', tag:'The <em>Architect</em>',
+    desc:"You are a systems thinker who sees the deep structure underneath complexity. Analytical depth plus logical precision makes you exceptional at research, engineering, medicine, and economics.",
+    traits:['Precise','Systematic','Deep reader','Evidence-seeker','Independent','Methodical'],
+    streams:[{e:'🔬',n:'Science',t:'s',w:'Research and engineering need this',m:93},{e:'📋',n:'Commerce',t:'c',w:'CA and Economics demand your profile',m:82},{e:'⚖️',n:'Arts / Law',t:'a',w:'Legal analysis suits deep reasoning',m:70}]
+  },
+  'a-c': { emoji:'🧩', tag:'The <em>Explorer</em>',
+    desc:"You dig deep AND dream big — a rare combination. You uncover insights others miss and communicate them compellingly. Psychology, UX research, cultural studies, and documentary work are built for you.",
+    traits:['Inquisitive','Open-minded','Synthesiser','Empathetic','Perceptive','Versatile'],
+    streams:[{e:'🎨',n:'Arts',t:'a',w:'Psychology and design research need your depth',m:88},{e:'📱',n:'Commerce',t:'c',w:'Market research rewards your blend',m:76},{e:'🧪',n:'Science',t:'s',w:'Behavioural science spans both',m:72}]
+  },
+};
+
+function showResults(pct, top, sec) {
+  document.getElementById('qDots').style.display = 'none';
+  showScreen('resultsScreen');
+
+  const key     = `${top}-${sec}`;
+  const profile = PROFILES[key] || PROFILES['a-l'];
+
+  // Hero
+  document.getElementById('resEmoji').textContent = profile.emoji;
+  document.getElementById('resTag').innerHTML     = `The ${profile.tag.replace('<em>','<em>')}`;
+  document.getElementById('resDesc').textContent  = profile.desc;
+
+  // Bars
+  setTimeout(() => {
+    document.getElementById('lBar').style.width  = pct.l + '%';
+    document.getElementById('cBar').style.width  = pct.c + '%';
+    document.getElementById('aBar').style.width  = pct.a + '%';
+    document.getElementById('lPct').textContent  = pct.l + '%';
+    document.getElementById('cPct').textContent  = pct.c + '%';
+    document.getElementById('aPct').textContent  = pct.a + '%';
+  }, 80);
+
+  // Traits
+  const tw = document.getElementById('traitsWrap');
+  tw.innerHTML = '';
+  profile.traits.forEach(t => {
+    const s = document.createElement('span');
+    s.className = 'trait'; s.textContent = t;
+    tw.appendChild(s);
+  });
+
+  // Subject aptitude
+  const SUBJ_META = {
+    Math:['➕','Math'], Science:['🔬','Science'], English:['📝','English'],
+    Social:['🌍','Social'], Hindi:['🇮🇳','Hindi'], Computer:['💻','Computer']
+  };
+  const ag = document.getElementById('aptGrid');
+  ag.innerHTML = '';
+  Object.entries(marks).forEach(([s,v]) => {
+    const [emoji,label] = SUBJ_META[s];
+    const d = document.createElement('div');
+    d.className = 'apt-card';
+    d.innerHTML = `<span class="apt-emoji">${emoji}</span><div class="apt-subj">${label}</div><div class="apt-val">${v}<span style="font-size:.65rem;opacity:.45">/100</span></div>`;
+    ag.appendChild(d);
+  });
+
+  // Stream recommendations
+  const sg = document.getElementById('streamGrid');
+  sg.innerHTML = '';
+  profile.streams.forEach(s => {
+    const d = document.createElement('div');
+    d.className = `stream-card ${s.t}`;
+    d.innerHTML = `<span class="stream-emoji">${s.e}</span><div class="stream-name">${s.n}</div><div class="stream-why">${s.w}</div><span class="stream-pct">${s.m}% match</span>`;
+    sg.appendChild(d);
+  });
+
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+</script>
 </body>
 </html>
