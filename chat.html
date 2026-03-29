@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<<<<<<< HEAD
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Student AI Mentor</title>
+<title>Pathfindr - Student AI Mentor</title>
+<link rel="stylesheet" href="style.css" />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
     :root {
@@ -137,16 +137,40 @@
         visibility: visible;
     }
 
-    /* Header */
     .chat-header {
         background: linear-gradient(135deg, var(--light-orange), var(--primary-orange));
-        padding: 20px;
+        padding: 15px 20px;
         color: white;
-        text-align: center;
+        text-align: left;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 
-    .chat-header h2 { font-size: 1.2rem; font-weight: 600; }
-    .chat-header p { font-size: 0.8rem; opacity: 0.9; }
+    .header-info h2 { font-size: 1.1rem; font-weight: 600; }
+    .header-info p { font-size: 0.75rem; opacity: 0.9; }
+
+    .btn-quiz-next {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        padding: 8px 16px;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-quiz-next:hover {
+        background: white;
+        color: var(--primary-orange);
+        transform: translateY(-2px);
+    }
 
     /* Messages Area */
     #chat-box {
@@ -241,14 +265,6 @@
 
     button:hover { background: var(--light-orange); }
 </style>
-=======
-  <meta charset="UTF-8" />
-  <!-- This makes the site look correct on mobile phones -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pathfindr</title>
-  <!-- Link to our shared stylesheet -->
-  <link rel="stylesheet" href="style.css" />
->>>>>>> e48ba93091c9cee34e8c8650c3b96e7125f4fb4f
 </head>
 <body>
 
@@ -272,8 +288,13 @@
 
 <div class="chat-container">
     <div class="chat-header">
-        <h2>Academic AI Assistant</h2>
-        <p>Formal • Polite • Insightful</p>
+        <div class="header-info">
+            <h2>Academic AI Assistant</h2>
+            <p>Formal • Polite • Insightful</p>
+        </div>
+        <a href="quiz.html" class="btn-quiz-next">
+            Take Quiz 📝
+        </a>
     </div>
 
     <div id="chat-box">
