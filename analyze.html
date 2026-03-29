@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Step 6 — AI Analyses Everything</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --amber-50: #fffbf2;
+    --amber-100: #fef3d0;
+    --amber-200: #fde68a;
+    --amber-300: #fcd34d;
+    --amber-400: #f59e0b;
+    --amber-500: #d97706;
+    --amber-600: #b45309;
+    --amber-700: #92400e;
+    --amber-800: #78350f;
+    --text-dark: #1c1009;
+    --text-mid: #5c3d1e;
+    --text-soft: #9a7040;
+    --border: #f0d9a8;
+    --surface: #fff;
+    --bg: #fffbf2;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-dark);
+    min-height: 100vh;
+  }
+
+  /* TOP BAR */
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .topbar-logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: var(--amber-600);
+    letter-spacing: -0.3px;
+  }
+  .topbar-steps { display: flex; align-items: center; gap: 4px; }
+  .step-dot { width: 28px; height: 6px; border-radius: 3px; background: var(--amber-100); }
+  .step-dot.done { background: var(--amber-400); }
+  .step-dot.active { background: var(--amber-600); }
+  .topbar-label { font-size: 13px; color: var(--text-soft); font-weight: 500; }
+
+  /* PAGE */
+  .page { max-width: 820px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+
+  /* HEADER */
+  .page-header { margin-bottom: 2rem; animation: fadeUp 0.5s ease both; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--amber-100); color: var(--amber-700);
+    font-size: 11px; font-weight: 600; padding: 4px 12px;
+    border-radius: 20px; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 12px;
+  }
+  .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--amber-500); }
+  .page-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 32px; color: var(--text-dark);
+    letter-spacing: -0.5px; margin-bottom: 8px; line-height: 1.2;
+  }
+  .page-sub { font-size: 15px; color: var(--text-soft); line-height: 1.6; max-width: 560px; }
+
+  /* SNAPSHOT */
+  .snapshot-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 12px; margin-bottom: 1.5rem; animation: fadeUp 0.5s 0.1s ease both;
+  }
+  .snap-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 16px 18px; position: relative; overflow: hidden;
+  }
+  .snap-card::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+    height: 3px; background: linear-gradient(90deg, var(--amber-300), var(--amber-500));
+  }
+  .snap-label { font-size: 11px; font-weight: 600; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+  .snap-val { font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--amber-700); line-height: 1; margin-bottom: 4px; }
+  .snap-sub { font-size: 12px; color: var(--text-soft); }
+
+  /* MARKS */
+  .marks-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem;
+    animation: fadeUp 0.5s 0.2s ease both;
+  }
+  .card-heading {
+    font-size: 12px; font-weight: 600; color: var(--text-soft);
+    text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1.25rem;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-heading::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .bar-subj { font-size: 13px; font-weight: 500; color: var(--text-mid); width: 100px; flex-shrink: 0; }
+  .bar-track { flex: 1; height: 9px; background: var(--amber-100); border-radius: 5px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 5px; background: linear-gradient(90deg, var(--amber-300), var(--amber-600)); width: 0; transition: width 1.3s cubic-bezier(0.4,0,0.2,1); }
+  .bar-num { font-size: 13px; font-weight: 600; color: var(--amber-700); width: 36px; text-align: right; flex-shrink: 0; }
+
+  /* BUTTON */
+  .btn-wrap { margin-bottom: 1.5rem; animation: fadeUp 0.5s 0.3s ease both; }
+  .analyse-btn {
+    width: 100%; padding: 16px 24px; background: var(--amber-600);
+    color: #fff; border: none; border-radius: 14px;
+    font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 600;
+    cursor: pointer; letter-spacing: 0.02em; transition: background 0.2s, transform 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .analyse-btn:hover { background: var(--amber-700); transform: translateY(-1px); }
+  .analyse-btn:active { transform: translateY(0); }
+  .analyse-btn:disabled { background: var(--amber-200); color: var(--amber-600); cursor: not-allowed; transform: none; }
+
+  /* LOADING */
+  .loading-box {
+    display: none; background: var(--amber-100); border: 1px solid var(--amber-200);
+    border-radius: 14px; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem;
+    align-items: flex-start; gap: 14px;
+  }
+  .loading-box.show { display: flex; }
+  .spinner {
+    width: 20px; height: 20px; border: 2.5px solid var(--amber-200);
+    border-top-color: var(--amber-600); border-radius: 50%;
+    animation: spin 0.75s linear infinite; flex-shrink: 0; margin-top: 2px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-steps { flex: 1; }
+  .loading-step {
+    font-size: 13px; color: var(--text-mid); font-weight: 500;
+    padding: 3px 0; opacity: 0; transform: translateY(4px);
+    transition: opacity 0.3s, transform 0.3s; display: flex; align-items: center; gap: 8px;
+  }
+  .loading-step.done { opacity: 0.5; transform: none; }
+  .loading-step.active { opacity: 1; transform: none; color: var(--amber-700); font-weight: 600; }
+
+  /* RESULTS */
+  .results { display: none; }
+  .results.show { display: block; animation: fadeUp 0.5s ease both; }
+  .section-label {
+    font-size: 12px; font-weight: 600; color: var(--text-soft);
+    text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* STREAM CARDS */
+  .stream-cards { display: flex; flex-direction: column; gap: 14px; margin-bottom: 1.75rem; }
+  .stream-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 1.5rem; position: relative; overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+  .stream-card:hover { box-shadow: 0 4px 20px rgba(180,83,9,0.08); }
+  .stream-card.top-pick { border-color: var(--amber-400); }
+  .stream-card.top-pick::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 3px; background: linear-gradient(90deg, var(--amber-300), var(--amber-600));
+  }
+  .stream-top-row {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    margin-bottom: 10px; gap: 12px;
+  }
+  .stream-rank-badge {
+    font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px;
+    text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; flex-shrink: 0;
+  }
+  .rank-1 { background: var(--amber-200); color: var(--amber-800); }
+  .rank-2 { background: var(--amber-100); color: var(--amber-700); }
+  .rank-3 { background: #f5f5f5; color: #777; }
+  .stream-name {
+    font-family: 'DM Serif Display', serif; font-size: 22px;
+    color: var(--text-dark); margin-bottom: 10px; line-height: 1.1;
+  }
+  .compat-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .compat-track { flex: 1; height: 8px; background: var(--amber-100); border-radius: 4px; overflow: hidden; }
+  .compat-fill {
+    height: 100%; border-radius: 4px;
+    background: linear-gradient(90deg, var(--amber-300), var(--amber-600));
+    width: 0; transition: width 1.4s cubic-bezier(0.4,0,0.2,1);
+  }
+  .compat-pct { font-size: 14px; font-weight: 700; color: var(--amber-700); width: 44px; text-align: right; flex-shrink: 0; }
+  .ai-reason {
+    font-size: 14px; color: var(--text-mid); line-height: 1.7; margin-bottom: 14px;
+    padding: 12px 14px; background: var(--amber-50); border-radius: 10px;
+    border-left: 3px solid var(--amber-400);
+  }
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 4px; }
+  .info-box { background: var(--amber-50); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+  .info-box-label { font-size: 11px; font-weight: 600; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+  .career-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { font-size: 12px; font-weight: 500; background: var(--surface); color: var(--amber-700); border: 1px solid var(--amber-200); border-radius: 20px; padding: 4px 11px; }
+  .salary-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .sal-col { display: flex; flex-direction: column; gap: 3px; }
+  .sal-label { font-size: 11px; color: var(--text-soft); }
+  .sal-val { font-size: 14px; font-weight: 600; color: var(--text-dark); }
+
+  /* IMPROVEMENT */
+  .improve-section { margin-bottom: 1.75rem; }
+  .improve-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; }
+  .improve-intro { font-size: 14px; color: var(--text-soft); margin-bottom: 1.25rem; line-height: 1.6; }
+  .improve-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+  }
+  .improve-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .improve-num {
+    width: 28px; height: 28px; background: var(--amber-100); color: var(--amber-700);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; flex-shrink: 0;
+  }
+  .improve-text { flex: 1; }
+  .improve-title-text { font-size: 14px; font-weight: 600; color: var(--text-dark); margin-bottom: 3px; }
+  .improve-desc { font-size: 13px; color: var(--text-soft); line-height: 1.6; }
+  .improve-tag {
+    display: inline-block; margin-top: 6px; font-size: 11px; font-weight: 600;
+    background: var(--amber-100); color: var(--amber-700); padding: 2px 9px; border-radius: 20px;
+  }
+
+  /* DISCLAIMER & NEXT */
+  .disclaimer {
+    background: var(--amber-50); border: 1px solid var(--border); border-radius: 12px;
+    padding: 1rem 1.25rem; font-size: 13px; color: var(--text-soft); line-height: 1.65;
+    margin-bottom: 1.5rem; display: flex; gap: 10px; align-items: flex-start;
+  }
+  .disc-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+  .next-btn {
+    width: 100%; padding: 15px 24px; background: var(--text-dark); color: #fff;
+    border: none; border-radius: 14px; font-family: 'DM Sans', sans-serif;
+    font-size: 15px; font-weight: 600; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 10px; transition: background 0.2s;
+  }
+  .next-btn:hover { background: var(--amber-800); }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 540px) {
+    .snapshot-grid { grid-template-columns: 1fr 1fr; }
+    .info-grid { grid-template-columns: 1fr; }
+    .page-title { font-size: 26px; }
+    .stream-name { font-size: 20px; }
+    .topbar-steps { display: none; }
+    .page { padding: 1.5rem 1rem 3rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-logo">StreamAI</div>
+  <div class="topbar-steps">
+    <div class="step-dot done"></div>
+    <div class="step-dot done"></div>
+    <div class="step-dot done"></div>
+    <div class="step-dot done"></div>
+    <div class="step-dot done"></div>
+    <div class="step-dot active"></div>
+    <div class="step-dot"></div>
+    <div class="step-dot"></div>
+  </div>
+  <div class="topbar-label">Step 6 of 8</div>
+</div>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="badge"><div class="badge-dot"></div> Step 6 of 8 — New</div>
+    <div class="page-title">AI Analyses Everything</div>
+    <div class="page-sub">Your academic marks, personality profile, and AI chat history are processed together to generate a personalised stream recommendation, career paths, salary projections, and an improvement plan.</div>
+  </div>
+
+  <!-- SNAPSHOT -->
+  <div class="snapshot-grid">
+    <div class="snap-card">
+      <div class="snap-label">Academic Score</div>
+      <div class="snap-val">78%</div>
+      <div class="snap-sub">Weighted average</div>
+    </div>
+    <div class="snap-card">
+      <div class="snap-label">Personality Type</div>
+      <div class="snap-val" style="font-size:20px;margin-top:4px;">Analytical</div>
+      <div class="snap-sub">Thinking style</div>
+    </div>
+    <div class="snap-card">
+      <div class="snap-label">AI Chat Sessions</div>
+      <div class="snap-val">3</div>
+      <div class="snap-sub">Doubts cleared</div>
+    </div>
+  </div>
+
+  <!-- MARKS -->
+  <div class="marks-card">
+    <div class="card-heading">Subject-wise Marks</div>
+    <div class="bar-row"><span class="bar-subj">Mathematics</span><div class="bar-track"><div class="bar-fill" data-w="88"></div></div><span class="bar-num">88%</span></div>
+    <div class="bar-row"><span class="bar-subj">Science</span><div class="bar-track"><div class="bar-fill" data-w="82"></div></div><span class="bar-num">82%</span></div>
+    <div class="bar-row"><span class="bar-subj">English</span><div class="bar-track"><div class="bar-fill" data-w="75"></div></div><span class="bar-num">75%</span></div>
+    <div class="bar-row"><span class="bar-subj">Social Science</span><div class="bar-track"><div class="bar-fill" data-w="70"></div></div><span class="bar-num">70%</span></div>
+    <div class="bar-row"><span class="bar-subj">Hindi</span><div class="bar-track"><div class="bar-fill" data-w="65"></div></div><span class="bar-num">65%</span></div>
+    <div class="bar-row"><span class="bar-subj">Computer Sci.</span><div class="bar-track"><div class="bar-fill" data-w="90"></div></div><span class="bar-num">90%</span></div>
+  </div>
+
+  <!-- BUTTON -->
+  <div class="btn-wrap">
+    <button class="analyse-btn" id="analyseBtn" onclick="startAnalysis()">
+      &#9654;&nbsp; Analyse My Profile with AI
+    </button>
+  </div>
+
+  <!-- LOADING -->
+  <div class="loading-box" id="loadingBox">
+    <div class="spinner"></div>
+    <div class="loading-steps">
+      <div class="loading-step" id="ls0">&#9679;&nbsp; Sending profile to Claude API...</div>
+      <div class="loading-step" id="ls1">&#9679;&nbsp; Processing marks and weighted scores...</div>
+      <div class="loading-step" id="ls2">&#9679;&nbsp; Analysing personality type and thinking style...</div>
+      <div class="loading-step" id="ls3">&#9679;&nbsp; Reviewing AI chat history for interest signals...</div>
+      <div class="loading-step" id="ls4">&#9679;&nbsp; Generating personalised stream recommendations...</div>
+      <div class="loading-step" id="ls5">&#9679;&nbsp; Calculating career paths and salary data...</div>
+      <div class="loading-step" id="ls6">&#9679;&nbsp; Preparing improvement suggestions...</div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results" id="results">
+
+    <div class="section-label">Stream Recommendations</div>
+    <div class="stream-cards">
+
+      <!-- #1 -->
+      <div class="stream-card top-pick">
+        <div class="stream-top-row">
+          <div class="stream-name">Science (PCM)</div>
+          <span class="stream-rank-badge rank-1">Best Match</span>
+        </div>
+        <div class="compat-row">
+          <div class="compat-track"><div class="compat-fill" data-w="91"></div></div>
+          <span class="compat-pct">91%</span>
+        </div>
+        <div class="ai-reason">Your Mathematics score of 88% and Computer Science score of 90% reflect a strong aptitude for logical and quantitative reasoning. Combined with your Analytical personality profile — which excels at pattern recognition and structured problem-solving — Science (PCM) represents the strongest alignment with your academic strengths and cognitive style. Your AI chat history also revealed consistent curiosity around technology and engineering topics.</div>
+        <div class="info-grid">
+          <div class="info-box">
+            <div class="info-box-label">Top Career Paths</div>
+            <div class="career-chips">
+              <span class="chip">Software Engineer</span>
+              <span class="chip">Data Scientist</span>
+              <span class="chip">Mechanical Eng.</span>
+              <span class="chip">Research Analyst</span>
+            </div>
+          </div>
+          <div class="info-box">
+            <div class="info-box-label">Salary Projections</div>
+            <div class="salary-row">
+              <div class="sal-col"><span class="sal-label">Starting</span><span class="sal-val">₹4–8 LPA</span></div>
+              <div class="sal-col"><span class="sal-label">Mid-career</span><span class="sal-val">₹12–25 LPA</span></div>
+              <div class="sal-col"><span class="sal-label">Senior</span><span class="sal-val">₹30–60 LPA</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- #2 -->
+      <div class="stream-card">
+        <div class="stream-top-row">
+          <div class="stream-name">Science (PCB)</div>
+          <span class="stream-rank-badge rank-2">Second Match</span>
+        </div>
+        <div class="compat-row">
+          <div class="compat-track"><div class="compat-fill" data-w="74"></div></div>
+          <span class="compat-pct">74%</span>
+        </div>
+        <div class="ai-reason">Your Science score of 82% shows solid potential in biological sciences. However, your AI chat history reflects a stronger interest in technology and computing, which aligns less directly with PCB. This stream remains a viable option if your interest shifts toward medicine or life sciences in the future.</div>
+        <div class="info-grid">
+          <div class="info-box">
+            <div class="info-box-label">Top Career Paths</div>
+            <div class="career-chips">
+              <span class="chip">MBBS / Doctor</span>
+              <span class="chip">Pharmacist</span>
+              <span class="chip">Biotech Researcher</span>
+            </div>
+          </div>
+          <div class="info-box">
+            <div class="info-box-label">Salary Projections</div>
+            <div class="salary-row">
+              <div class="sal-col"><span class="sal-label">Starting</span><span class="sal-val">₹3–6 LPA</span></div>
+              <div class="sal-col"><span class="sal-label">Mid-career</span><span class="sal-val">₹10–20 LPA</span></div>
+              <div class="sal-col"><span class="sal-label">Senior</span><span class="sal-val">₹25–50 LPA</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- #3 -->
+      <div class="stream-card">
+        <div class="stream-top-row">
+          <div class="stream-name">Commerce</div>
+          <span class="stream-rank-badge rank-3">Third Match</span>
+        </div>
+        <div class="compat-row">
+          <div class="compat-track"><div class="compat-fill" data-w="58"></div></div>
+          <span class="compat-pct">58%</span>
+        </div>
+        <div class="ai-reason">Your Mathematics strength is transferable to Commerce through Accountancy and Economics. However, your personality type and subject preferences suggest a stronger inclination towards technical and scientific disciplines. Commerce is a reasonable alternative if you prefer a less competitive entrance exam pathway.</div>
+        <div class="info-grid">
+          <div class="info-box">
+            <div class="info-box-label">Top Career Paths</div>
+            <div class="career-chips">
+              <span class="chip">CA / CFA</span>
+              <span class="chip">MBA</span>
+              <span class="chip">Financial Analyst</span>
+            </div>
+          </div>
+          <div class="info-box">
+            <div class="info-box-label">Salary Projections</div>
+            <div class="salary-row">
+              <div class="sal-col"><span class="sal-label">Starting</span><span class="sal-val">₹3–6 LPA</span></div>
+              <div class="sal-col"><span class="sal-label">Mid-career</span><span class="sal-val">₹10–18 LPA</span></div>
+              <div class="sal-col"><span class="sal-label">Senior</span><span class="sal-val">₹20–45 LPA</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- IMPROVEMENT -->
+    <div class="improve-section">
+      <div class="section-label">Personalised Improvement Suggestions</div>
+      <div class="improve-card">
+        <div class="improve-intro">Based on your full profile, the following targeted improvements will strengthen both your board performance and entrance exam readiness.</div>
+
+        <div class="improve-item">
+          <div class="improve-num">1</div>
+          <div class="improve-text">
+            <div class="improve-title-text">Strengthen Hindi — Urgent</div>
+            <div class="improve-desc">Your Hindi score of 65% is the weakest subject. Strengthening language skills will benefit performance in the CUET entrance exam, which includes a mandatory language section.</div>
+            <span class="improve-tag">Focus: Hindi</span>
+          </div>
+        </div>
+
+        <div class="improve-item">
+          <div class="improve-num">2</div>
+          <div class="improve-text">
+            <div class="improve-title-text">Improve Social Science for Board Percentage</div>
+            <div class="improve-desc">Your Social Science score of 70% contributes significantly to your overall Class 10 board percentage, which many colleges use for admission cutoffs even for Science stream applicants.</div>
+            <span class="improve-tag">Focus: Social Science</span>
+          </div>
+        </div>
+
+        <div class="improve-item">
+          <div class="improve-num">3</div>
+          <div class="improve-text">
+            <div class="improve-title-text">Begin JEE Foundation Preparation Now</div>
+            <div class="improve-desc">Your Mathematics (88%) and Computer Science (90%) scores provide a strong head start for JEE Mains. Starting foundation preparation in Class 11 significantly improves long-term outcome probabilities.</div>
+            <span class="improve-tag">JEE Preparation</span>
+          </div>
+        </div>
+
+        <div class="improve-item">
+          <div class="improve-num">4</div>
+          <div class="improve-text">
+            <div class="improve-title-text">Channel Your Analytical Strength Effectively</div>
+            <div class="improve-desc">Your Analytical personality type responds best to structured, methodical study. Practising previous-year JEE Mains papers using timed sessions will channel this strength most effectively.</div>
+            <span class="improve-tag">Study Strategy</span>
+          </div>
+        </div>
+
+        <div class="improve-item">
+          <div class="improve-num">5</div>
+          <div class="improve-text">
+            <div class="improve-title-text">Learn Basic Programming Alongside Class 11</div>
+            <div class="improve-desc">Your Computer Science aptitude (90%) is exceptional. Pursuing Python or C++ beyond the curriculum will create a significant career advantage and reinforce your JEE preparation in the long term.</div>
+            <span class="improve-tag">Skill Building</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DISCLAIMER -->
+    <div class="disclaimer">
+      <span class="disc-icon">&#9432;</span>
+      This analysis has been generated by AI based on your academic marks, personality type, and AI chat history. It is a data-backed suggestion intended to guide your decision — the final choice of stream rests entirely with you and your family.
+    </div>
+
+    <!-- NEXT -->
+    <button class="next-btn" onclick="alert('Proceeding to Step 7 — Why You? Explanation')">
+      Continue to Step 7 — "Why You?" Explanation &nbsp;&rarr;
+    </button>
+
+  </div>
+</div>
+
+<script>
+  setTimeout(() => {
+    document.querySelectorAll('.bar-fill').forEach(el => {
+      el.style.width = el.getAttribute('data-w') + '%';
+    });
+  }, 400);
+
+  function startAnalysis() {
+    const btn = document.getElementById('analyseBtn');
+    const box = document.getElementById('loadingBox');
+    btn.disabled = true;
+    btn.innerHTML = '&#9654;&nbsp; Analysis in Progress...';
+    box.classList.add('show');
+
+    let i = 0;
+    const tick = setInterval(() => {
+      if (i > 0) {
+        const prev = document.getElementById('ls' + (i - 1));
+        if (prev) { prev.classList.remove('active'); prev.classList.add('done'); }
+      }
+      const cur = document.getElementById('ls' + i);
+      if (cur) cur.classList.add('active');
+      i++;
+      if (i >= 8) {
+        clearInterval(tick);
+        setTimeout(() => {
+          box.classList.remove('show');
+          btn.innerHTML = '&#10003;&nbsp; Analysis Complete';
+          const results = document.getElementById('results');
+          results.classList.add('show');
+          setTimeout(() => {
+            document.querySelectorAll('.compat-fill').forEach(el => {
+              el.style.width = el.getAttribute('data-w') + '%';
+            });
+          }, 300);
+          results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 600);
+      }
+    }, 750);
+  }
+</script>
+</body>
+</html>
