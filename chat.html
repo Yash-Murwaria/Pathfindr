@@ -115,11 +115,13 @@ const messages = document.getElementById("messages");
 const marks = localStorage.getItem("marks") || "Not provided";
 const scores = localStorage.getItem("scores") || "Not provided";
 const stream = localStorage.getItem("topStream") || "Not decided";
+const interests = localStorage.getItem("interests") || "Not provided";
 
 const context = `
 Marks: ${marks}
 Scores: ${scores}
 Stream: ${stream}
+Interests: ${interests}
 `;
 
 // 👋 Welcome

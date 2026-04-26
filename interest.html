@@ -3,465 +3,371 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Step 4 — Your Interests</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<title>Pathfindr — Your Interests</title>
+
+<!-- FONTS -->
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<!-- ICONS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+
 <style>
-  :root {
-    --amber-50: #fffbf2;
-    --amber-100: #fef3d0;
-    --amber-200: #fde68a;
-    --amber-300: #fcd34d;
-    --amber-400: #f59e0b;
-    --amber-500: #d97706;
-    --amber-600: #b45309;
-    --amber-700: #92400e;
-    --amber-800: #78350f;
-    --text-dark: #1c1009;
-    --text-mid: #5c3d1e;
-    --text-soft: #9a7040;
-    --border: #f0d9a8;
-    --surface: #fff;
-    --bg: #fffbf2;
-  }
+:root {
+  --fire: #FF6B00;
+  --amber: #FF9A00;
+  --gold: #FFB830;
+  --cream: #FFF8EE;
+  --dark: #1A0E00;
+  --bg: radial-gradient(circle at top, #2C1A00, #1A0E00);
+}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text-dark);
-    min-height: 100vh;
-  }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--cream);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-x: hidden;
+}
 
-  /* TOP BAR */
-  .topbar {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 0 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 60px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .topbar-logo {
-    font-family: 'DM Serif Display', serif;
-    font-size: 20px;
-    color: var(--amber-600);
-    letter-spacing: -0.3px;
-  }
-  .topbar-steps { display: flex; align-items: center; gap: 4px; }
-  .step-dot { width: 28px; height: 6px; border-radius: 3px; background: var(--amber-100); }
-  .step-dot.done { background: var(--amber-400); }
-  .step-dot.active { background: var(--amber-600); }
-  .topbar-label { font-size: 13px; color: var(--text-soft); font-weight: 500; }
+/* MAIN CARD */
+.container {
+  width: 100%;
+  max-width: 500px;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(15px);
+  padding: 40px;
+  border-radius: 30px;
+  border: 1px solid rgba(255, 184, 48, 0.15);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  animation: fadeIn 0.8s ease-out;
+}
 
-  /* PAGE */
-  .page { max-width: 820px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-  /* HEADER */
-  .page-header { margin-bottom: 2rem; animation: fadeUp 0.5s ease both; }
-  .badge {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: var(--amber-100); color: var(--amber-700);
-    font-size: 11px; font-weight: 600; padding: 4px 12px;
-    border-radius: 20px; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 12px;
-  }
-  .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--amber-500); }
-  .page-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 32px; color: var(--text-dark);
-    letter-spacing: -0.5px; margin-bottom: 8px; line-height: 1.2;
-  }
-  .page-sub { font-size: 15px; color: var(--text-soft); line-height: 1.6; max-width: 560px; }
+/* TITLE */
+h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 10px;
+  background: linear-gradient(135deg, var(--fire), var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 
-  /* MAIN CARD */
-  .interest-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 2rem;
-    animation: fadeUp 0.5s 0.1s ease both;
-  }
+.subtitle {
+  font-size: 1rem;
+  color: rgba(255, 248, 238, 0.6);
+  margin-bottom: 35px;
+}
 
-  .field-label {
-    font-size: 13px; font-weight: 600; color: var(--text-soft);
-    text-transform: uppercase; letter-spacing: 0.06em;
-    margin-bottom: 10px;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .field-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+/* SEARCH BAR */
+.search-box {
+  position: relative;
+  margin-bottom: 30px;
+}
 
-  .field-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 22px; color: var(--text-dark);
-    margin-bottom: 6px; line-height: 1.3;
-  }
-  .field-hint {
-    font-size: 13px; color: var(--text-soft);
-    margin-bottom: 1.5rem; line-height: 1.5;
-  }
+.search-box i {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--amber);
+  opacity: 0.6;
+}
 
-  /* CUSTOM DROPDOWN */
-  .dropdown-wrapper { position: relative; margin-bottom: 1.5rem; }
+.input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 184, 48, 0.2);
+  border-radius: 15px;
+  padding: 15px 15px 15px 45px;
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.3s ease;
+}
 
-  .dropdown-trigger {
-    width: 100%;
-    background: var(--surface);
-    border: 1.5px solid var(--amber-300);
-    border-radius: 14px;
-    padding: 14px 18px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    color: var(--text-mid);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    user-select: none;
-  }
-  .dropdown-trigger:hover { border-color: var(--amber-500); }
-  .dropdown-trigger.open {
-    border-color: var(--amber-600);
-    box-shadow: 0 0 0 3px rgba(180,83,9,0.1);
-    border-radius: 14px 14px 0 0;
-  }
-  .dropdown-trigger-text { color: var(--text-soft); }
-  .dropdown-trigger-text.has-selection { color: var(--text-dark); font-weight: 500; }
-  .dropdown-arrow {
-    width: 18px; height: 18px; flex-shrink: 0;
-    color: var(--amber-500); transition: transform 0.25s;
-  }
-  .dropdown-trigger.open .dropdown-arrow { transform: rotate(180deg); }
+.input:focus {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--amber);
+  box-shadow: 0 0 15px rgba(255, 154, 0, 0.2);
+}
 
-  .dropdown-menu {
-    display: none;
-    position: absolute;
-    top: 100%; left: 0; right: 0;
-    background: var(--surface);
-    border: 1.5px solid var(--amber-600);
-    border-top: none;
-    border-radius: 0 0 14px 14px;
-    box-shadow: 0 8px 24px rgba(180,83,9,0.12);
-    z-index: 50;
-    max-height: 320px;
-    overflow-y: auto;
-  }
-  .dropdown-menu.open { display: block; animation: dropDown 0.2s ease both; }
-  @keyframes dropDown { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+/* OPTIONS GRID (CHIPS) */
+.options-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 5px;
+  margin-bottom: 35px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--amber) transparent;
+}
 
-  .dropdown-search {
-    padding: 10px 14px;
-    border-bottom: 1px solid var(--border);
-    position: sticky; top: 0; background: var(--surface); z-index: 1;
-  }
-  .dropdown-search input {
-    width: 100%; border: 1px solid var(--border); border-radius: 8px;
-    padding: 7px 12px; font-family: 'DM Sans', sans-serif; font-size: 13px;
-    color: var(--text-dark); background: var(--amber-50); outline: none;
-    transition: border-color 0.2s;
-  }
-  .dropdown-search input:focus { border-color: var(--amber-400); }
-  .dropdown-search input::placeholder { color: var(--text-soft); }
+.options-grid::-webkit-scrollbar {
+  width: 6px;
+}
+.options-grid::-webkit-scrollbar-thumb {
+  background: var(--amber);
+  border-radius: 10px;
+}
 
-  .dropdown-option {
-    display: flex; align-items: center; gap: 12px;
-    padding: 11px 16px; cursor: pointer;
-    transition: background 0.15s;
-    border-bottom: 1px solid var(--amber-50);
-  }
-  .dropdown-option:last-child { border-bottom: none; }
-  .dropdown-option:hover { background: var(--amber-50); }
-  .dropdown-option.selected { background: var(--amber-100); }
+.option {
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 184, 48, 0.1);
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: rgba(255, 248, 238, 0.8);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
 
-  .option-checkbox {
-    width: 18px; height: 18px; border-radius: 5px;
-    border: 1.5px solid var(--amber-300); background: var(--surface);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; transition: all 0.15s;
-  }
-  .dropdown-option.selected .option-checkbox {
-    background: var(--amber-600); border-color: var(--amber-600);
-  }
-  .option-check {
-    display: none; color: #fff;
-  }
-  .dropdown-option.selected .option-check { display: block; }
+.option:hover {
+  background: rgba(255, 184, 48, 0.1);
+  border-color: var(--amber);
+  transform: translateY(-2px);
+}
 
-  .option-emoji { font-size: 17px; flex-shrink: 0; }
-  .option-label { font-size: 14px; font-weight: 500; color: var(--text-dark); }
-  .dropdown-option.selected .option-label { color: var(--amber-800); font-weight: 600; }
+.option.selected {
+  background: linear-gradient(135deg, var(--fire), var(--amber));
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 10px 20px rgba(255, 107, 0, 0.3);
+}
 
-  /* SELECTED TAGS */
-  .selected-tags-section { margin-bottom: 1.5rem; min-height: 0; }
-  .selected-tags-label {
-    font-size: 11px; font-weight: 600; color: var(--text-soft);
-    text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px;
-    display: none;
+/* COUNTER */
+.counter {
+  font-size: 0.85rem;
+  color: var(--gold);
+  margin-bottom: 20px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* NEXT BUTTON */
+.btn {
+  width: 100%;
+  padding: 16px;
+  border-radius: 18px;
+  border: none;
+  background: linear-gradient(135deg, var(--fire), var(--amber));
+  color: white;
+  font-family: 'Syne', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  box-shadow: 0 15px 30px rgba(255, 107, 0, 0.2);
+}
+
+.btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn:not(:disabled):hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(255, 107, 0, 0.4);
+}
+
+.btn:not(:disabled):active {
+  transform: translateY(-1px);
+}
+
+/* SKIP LINK */
+.skip-container {
+  margin-top: 25px;
+}
+
+.skip {
+  font-size: 0.9rem;
+  color: rgba(255, 248, 238, 0.4);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border-bottom: 1px solid transparent;
+}
+
+.skip:hover {
+  color: var(--gold);
+  border-bottom: 1px solid var(--gold);
+}
+
+/* RESPONSIVE */
+@media (max-width: 480px) {
+  .container {
+    padding: 30px 20px;
   }
-  .selected-tags-label.show { display: block; }
-  .tags-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
-  .tag {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: var(--amber-200); color: var(--amber-800);
-    border: 1px solid var(--amber-300);
-    font-size: 13px; font-weight: 600; padding: 6px 12px;
-    border-radius: 20px; animation: tagPop 0.2s ease both;
-  }
-  @keyframes tagPop { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: scale(1); } }
-  .tag-remove {
-    width: 16px; height: 16px; border-radius: 50%;
-    background: var(--amber-400); color: #fff;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; font-size: 10px; font-weight: 700;
-    transition: background 0.15s; flex-shrink: 0;
-    border: none; line-height: 1;
-  }
-  .tag-remove:hover { background: var(--amber-700); }
-
-  /* COUNTER */
-  .selection-counter {
-    font-size: 12px; color: var(--text-soft);
-    margin-bottom: 1.5rem; display: none;
-  }
-  .selection-counter.show { display: block; }
-  .counter-num { font-weight: 700; color: var(--amber-600); }
-
-  /* DIVIDER */
-  .divider { height: 1px; background: var(--border); margin: 1.5rem 0; }
-
-  /* NEXT BUTTON */
-  .next-btn {
-    width: 100%; padding: 15px 24px; background: var(--text-dark); color: #fff;
-    border: none; border-radius: 14px; font-family: 'DM Sans', sans-serif;
-    font-size: 15px; font-weight: 600; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; gap: 10px;
-    transition: background 0.2s, opacity 0.2s;
-    opacity: 0.4; pointer-events: none;
-  }
-  .next-btn.active { opacity: 1; pointer-events: all; }
-  .next-btn.active:hover { background: var(--amber-800); }
-
-  /* SKIP */
-  .skip-link {
-    display: block; text-align: center; margin-top: 14px;
-    font-size: 13px; color: var(--text-soft); cursor: pointer;
-    text-decoration: underline; text-underline-offset: 3px;
-    transition: color 0.15s;
-  }
-  .skip-link:hover { color: var(--amber-700); }
-
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-
-  @media (max-width: 540px) {
-    .page-title { font-size: 26px; }
-    .topbar-steps { display: none; }
-    .page { padding: 1.5rem 1rem 3rem; }
-    .interest-card { padding: 1.25rem; }
-  }
-
-  /* scrollbar for dropdown */
-  .dropdown-menu::-webkit-scrollbar { width: 5px; }
-  .dropdown-menu::-webkit-scrollbar-track { background: var(--amber-50); }
-  .dropdown-menu::-webkit-scrollbar-thumb { background: var(--amber-300); border-radius: 10px; }
+  h1 { font-size: 1.8rem; }
+}
 </style>
 </head>
+
 <body>
 
-<!-- TOP BAR -->
-<div class="topbar">
-  <div class="topbar-logo">StreamAI</div>
-  <div class="topbar-steps">
-    <div class="step-dot done"></div>
-    <div class="step-dot done"></div>
-    <div class="step-dot done"></div>
-    <div class="step-dot active"></div>
-    <div class="step-dot"></div>
-    <div class="step-dot"></div>
-    <div class="step-dot"></div>
-    <div class="step-dot"></div>
-  </div>
-  <div class="topbar-label">Step 4 of 8</div>
-</div>
+<div class="container">
+  <h1>Your Interests</h1>
+  <p class="subtitle">Tell us what fuels your curiosity ✨</p>
 
-<div class="page">
-
-  <!-- HEADER -->
-  <div class="page-header">
-    <div class="badge"><div class="badge-dot"></div> Step 4 of 8</div>
-    <div class="page-title">Your Interests &amp; Passions</div>
-    <div class="page-sub">Beyond academics, your interests reveal a lot about where you naturally thrive. This helps the AI build a more complete picture of who you are.</div>
+  <div class="search-box">
+    <i class="fas fa-search"></i>
+    <input 
+      type="text" 
+      placeholder="Search interests..." 
+      class="input" 
+      id="searchInput"
+      autocomplete="off"
+    />
   </div>
 
-  <!-- MAIN CARD -->
-  <div class="interest-card">
+  <div class="counter" id="selectionCounter">0 Interests Selected</div>
 
-    <div class="field-label">Enter your interest in field</div>
-    <div class="field-title">What activities excite you the most?</div>
-    <div class="field-hint">Select all that apply — there are no right or wrong answers here.</div>
+  <div class="options-grid" id="optionsList">
+    <!-- Interests will be injected here -->
+  </div>
 
-    <!-- DROPDOWN -->
-    <div class="dropdown-wrapper">
-      <div class="dropdown-trigger" id="dropdownTrigger" onclick="toggleDropdown()">
-        <span class="dropdown-trigger-text" id="triggerText">Choose your interests...</span>
-        <svg class="dropdown-arrow" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M5 8l5 5 5-5"/>
-        </svg>
-      </div>
-      <div class="dropdown-menu" id="dropdownMenu">
-        <div class="dropdown-search">
-          <input type="text" placeholder="Search interests..." id="searchInput" oninput="filterOptions()" onclick="event.stopPropagation()">
-        </div>
-        <div id="optionsList">
-          <!-- options injected by JS -->
-        </div>
-      </div>
-    </div>
+  <button class="btn" id="nextBtn" disabled>
+    Talk to Pathfindr AI 🤖 <i class="fas fa-arrow-right"></i>
+  </button>
 
-    <!-- COUNTER -->
-    <div class="selection-counter" id="selectionCounter">
-      <span class="counter-num" id="counterNum">0</span> interest(s) selected
-    </div>
-
-    <!-- SELECTED TAGS -->
-    <div class="selected-tags-section" id="tagsSection">
-      <div class="selected-tags-label" id="tagsLabel">Selected interests</div>
-      <div class="tags-wrap" id="tagsWrap"></div>
-    </div>
-
-    <div class="divider"></div>
-
-    <button class="next-btn" id="nextBtn" onclick="goNext()">
-      Continue to Step 5 &nbsp;→
-    </button>
-    <div class="skip-link" onclick="goNext()">Skip this step</div>
-
+  <div class="skip-container">
+    <a href="chat.html" class="skip" onclick="skipSelection()">Skip for now</a>
   </div>
 </div>
 
 <script>
-  const interests = [
-    { id: 'creativity',    emoji: '✨', label: 'Creativity' },
-    { id: 'sports',        emoji: '⚽', label: 'Sports' },
-    { id: 'dance',         emoji: '💃', label: 'Dance' },
-    { id: 'singing',       emoji: '🎤', label: 'Singing' },
-    { id: 'writing',       emoji: '✍️', label: 'Writing' },
-    { id: 'poetry',        emoji: '📜', label: 'Poetry' },
-    { id: 'painting',      emoji: '🎨', label: 'Painting' },
-    { id: 'photography',   emoji: '📷', label: 'Photography' },
-    { id: 'acting',        emoji: '🎭', label: 'Acting' },
-    { id: 'coding',        emoji: '💻', label: 'Coding' },
-    { id: 'music',         emoji: '🎵', label: 'Music' },
-    { id: 'cooking',       emoji: '🍳', label: 'Cooking' },
-    { id: 'gaming',        emoji: '🎮', label: 'Gaming' },
-    { id: 'reading',       emoji: '📚', label: 'Reading' },
-    { id: 'travel',        emoji: '✈️', label: 'Travel' },
-  ];
+const interests = [
+  { id: 'coding', label: 'Coding' },
+  { id: 'design', label: 'Design' },
+  { id: 'ai', label: 'Artificial Intelligence' },
+  { id: 'math', label: 'Mathematics' },
+  { id: 'science', label: 'Science' },
+  { id: 'business', label: 'Entrepreneurship' },
+  { id: 'writing', label: 'Writing' },
+  { id: 'gaming', label: 'Gaming' },
+  { id: 'music', label: 'Music' },
+  { id: 'sports', label: 'Sports' },
+  { id: 'psychology', label: 'Psychology' },
+  { id: 'astronomy', label: 'Astronomy' },
+  { id: 'photography', label: 'Photography' },
+  { id: 'finance', label: 'Finance' },
+  { id: 'marketing', label: 'Marketing' },
+  { id: 'robotics', label: 'Robotics' },
+  { id: 'debating', label: 'Debating' },
+  { id: 'teaching', label: 'Teaching' },
+  { id: 'law', label: 'Law' },
+  { id: 'social_work', label: 'Social Work' },
+  { id: 'history', label: 'History' },
+  { id: 'literature', label: 'Literature' },
+  { id: 'economics', label: 'Economics' },
+  { id: 'public_speaking', label: 'Public Speaking' }
+];
 
-  let selected = new Set();
+// Sort alphabetically
+interests.sort((a, b) => a.label.localeCompare(b.label));
 
-  function renderOptions(filter = '') {
-    const list = document.getElementById('optionsList');
-    const filtered = interests.filter(i => i.label.toLowerCase().includes(filter.toLowerCase()));
-    list.innerHTML = filtered.map(item => `
-      <div class="dropdown-option ${selected.has(item.id) ? 'selected' : ''}"
-           onclick="toggleOption('${item.id}')">
-        <div class="option-checkbox">
-          <svg class="option-check" width="10" height="8" viewBox="0 0 10 8" fill="none">
-            <path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <span class="option-emoji">${item.emoji}</span>
-        <span class="option-label">${item.label}</span>
-      </div>
-    `).join('');
+let selected = new Set();
+
+const list = document.getElementById('optionsList');
+const input = document.getElementById('searchInput');
+const btn = document.getElementById('nextBtn');
+const counter = document.getElementById('selectionCounter');
+
+/* RENDER */
+function render(filter = ''){
+  const filtered = interests.filter(i => 
+    i.label.toLowerCase().includes(filter.toLowerCase())
+  );
+
+  list.innerHTML = filtered.map(item => `
+    <div class="option ${selected.has(item.id) ? 'selected' : ''}" 
+         data-id="${item.id}">
+      ${item.label}
+    </div>
+  `).join('');
+  
+  updateUI();
+}
+
+/* UPDATE UI ELEMENTS */
+function updateUI() {
+  const count = selected.size;
+  counter.innerText = `${count} Interest${count !== 1 ? 's' : ''} Selected`;
+  
+  if(count > 0){
+    btn.disabled = false;
+  } else {
+    btn.disabled = true;
   }
+}
 
-  function renderTags() {
-    const wrap = document.getElementById('tagsWrap');
-    const label = document.getElementById('tagsLabel');
-    const counter = document.getElementById('selectionCounter');
-    const counterNum = document.getElementById('counterNum');
-    const nextBtn = document.getElementById('nextBtn');
-    const triggerText = document.getElementById('triggerText');
+/* CLICK HANDLING (EVENT DELEGATION) */
+list.addEventListener('click', (e)=>{
+  const option = e.target.closest('.option');
+  if(!option) return;
 
-    const selectedItems = interests.filter(i => selected.has(i.id));
+  const id = option.dataset.id;
 
-    wrap.innerHTML = selectedItems.map(item => `
-      <div class="tag">
-        ${item.emoji} ${item.label}
-        <button class="tag-remove" onclick="removeTag('${item.id}')">✕</button>
-      </div>
-    `).join('');
-
-    const count = selected.size;
-    label.classList.toggle('show', count > 0);
-    counter.classList.toggle('show', count > 0);
-    counterNum.textContent = count;
-    nextBtn.classList.toggle('active', count > 0);
-
-    triggerText.textContent = count === 0
-      ? 'Choose your interests...'
-      : `${count} interest${count > 1 ? 's' : ''} selected`;
-    triggerText.classList.toggle('has-selection', count > 0);
-  }
-
-  function toggleOption(id) {
-    if (selected.has(id)) {
-      selected.delete(id);
-    } else {
-      selected.add(id);
-    }
-    renderOptions(document.getElementById('searchInput').value);
-    renderTags();
-  }
-
-  function removeTag(id) {
+  if(selected.has(id)) {
     selected.delete(id);
-    renderOptions(document.getElementById('searchInput').value);
-    renderTags();
+    option.classList.remove('selected');
+  } else {
+    selected.add(id);
+    option.classList.add('selected');
   }
 
-  function toggleDropdown() {
-    const trigger = document.getElementById('dropdownTrigger');
-    const menu = document.getElementById('dropdownMenu');
-    const isOpen = menu.classList.contains('open');
-    if (isOpen) {
-      closeDropdown();
-    } else {
-      trigger.classList.add('open');
-      menu.classList.add('open');
-      document.getElementById('searchInput').focus();
-    }
-  }
+  updateUI();
+});
 
-  function closeDropdown() {
-    document.getElementById('dropdownTrigger').classList.remove('open');
-    document.getElementById('dropdownMenu').classList.remove('open');
-    document.getElementById('searchInput').value = '';
-    renderOptions('');
-  }
+/* SEARCH */
+input.addEventListener('input', () => render(input.value));
 
-  function filterOptions() {
-    renderOptions(document.getElementById('searchInput').value);
-  }
+/* NAVIGATION */
+btn.onclick = ()=>{
+  if(selected.size === 0) return;
+  
+  // Convert IDs back to labels for the AI context
+  const selectedLabels = interests
+    .filter(i => selected.has(i.id))
+    .map(i => i.label);
+    
+  localStorage.setItem("interests", JSON.stringify(selectedLabels));
+  window.location.href = "chat.html";
+};
 
-  document.addEventListener('click', (e) => {
-    const wrapper = document.querySelector('.dropdown-wrapper');
-    if (!wrapper.contains(e.target)) closeDropdown();
-  });
+function skipSelection() {
+  localStorage.setItem("interests", JSON.stringify(["None provided"]));
+  window.location.href = "chat.html";
+}
 
-  function goNext() {
-    alert('Proceeding to Step 5 — Personality + Aptitude Test');
-  }
-
-  // Init
-  renderOptions();
-  renderTags();
+/* INIT */
+render();
 </script>
 
 </body>
