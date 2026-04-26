@@ -4,131 +4,132 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pathfindr AI</title>
-
 <style>
+:root {
+  --primary: #FF8C00;
+  --bg1: #FFF5D6;
+  --bg2: #F6D68A;
+}
+
+/* BODY */
 body {
-  margin:0;
-  font-family: Arial;
-  background: linear-gradient(#FFF5D6,#F6D68A);
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(var(--bg1), var(--bg2));
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 
 /* CHAT BOX */
 .chat {
-  width:400px;
-  height:600px;
-  background:white;
-  border-radius:20px;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
+  width: 400px;
+  height: 600px;
+  background: white;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
 }
 
+/* HEADER */
 .header {
-  background:#FF8C00;
-  color:white;
-  padding:15px;
-  text-align:center;
-  font-weight:bold;
+  background: var(--primary);
+  color: white;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
 }
 
+.header button {
+  background: white;
+  color: var(--primary);
+  border: none;
+  padding: 6px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* MESSAGES */
 .messages {
-  flex:1;
-  padding:10px;
-  overflow-y:auto;
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
 }
 
 .msg {
-  margin:5px;
-  padding:8px;
-  border-radius:10px;
-  max-width:70%;
-  white-space:pre-wrap;
+  margin: 6px;
+  padding: 10px;
+  border-radius: 12px;
+  max-width: 70%;
+  white-space: pre-wrap;
 }
 
 .user {
-  background:#FF8C00;
-  color:white;
-  margin-left:auto;
+  background: var(--primary);
+  color: white;
+  margin-left: auto;
 }
 
 .ai {
-  background:#eee;
+  background: #eee;
 }
 
-.input {
-  display:flex;
+/* INPUT */
+.input-area {
+  display: flex;
+  border-top: 1px solid #ddd;
 }
 
-input {
-  flex:1;
-  padding:10px;
-  border:none;
-  outline:none;
+.input-area input {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  outline: none;
 }
 
-button {
-  background:#FF8C00;
-  color:white;
-  border:none;
-  padding:10px;
-  cursor:pointer;
-}
-
-/* 🎯 OUTSIDE BUTTON */
-.quiz-btn {
-  margin-top:15px;
-  width:200px;
-  border-radius:10px;
+.input-area button {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
 }
 </style>
 </head>
-
 <body>
-
-<!-- ✅ CHAT -->
 <div class="chat">
-  <div class="header">Pathfindr AI 🤖</div>
-
+  <div class="header">
+    <span>Pathfindr AI 🤖</span>
+    <button onclick="goToQuiz()">Quiz 🎯</button>
+  </div>
   <div id="messages" class="messages"></div>
-
-  <div class="input">
+  <div class="input-area">
     <input id="input" placeholder="Ask anything..." onkeypress="handleKey(event)">
     <button onclick="send()">Send</button>
   </div>
 </div>
-
-<!-- ✅ BUTTON OUTSIDE -->
-<button class="quiz-btn" onclick="goToQuiz()">
-  Take Quiz 🎯
-</button>
-
 <script>
 
 const messages = document.getElementById("messages");
 
-// 📊 Stored data
-const marks = localStorage.getItem("marks") || "Not provided";
-const scores = localStorage.getItem("scores") || "Not provided";
-const stream = localStorage.getItem("topStream") || "Not decided";
-const interests = localStorage.getItem("interests") || "Not provided";
-
+// User context (optional)
 const context = `
-Marks: ${marks}
-Scores: ${scores}
-Stream: ${stream}
-Interests: ${interests}
+Marks: ${localStorage.getItem("marks") || "N/A"}
+Scores: ${localStorage.getItem("scores") || "N/A"}
+Stream: ${localStorage.getItem("topStream") || "N/A"}
+Interests: ${localStorage.getItem("interests") || "N/A"}
 `;
 
-// 👋 Welcome
-addMsg("Hey! I'm Pathfindr AI 🤖\nAsk me anything about your career, streams, or confusion — I'm here for you.", "ai");
+// Welcome message
+addMsg("Hey! I'm Pathfindr AI 🤖\nAsk me anything about your career or studies.", "ai");
 
-// ➕ Add message
-function addMsg(text, type){
+// Add message
+function addMsg(text, type) {
   const div = document.createElement("div");
   div.className = "msg " + type;
   div.innerText = text;
@@ -136,13 +137,13 @@ function addMsg(text, type){
   messages.scrollTop = messages.scrollHeight;
 }
 
-// 🚀 Send message
-async function send(){
+// Send message
+async function send() {
   const input = document.getElementById("input");
   const text = input.value.trim();
-  if(!text) return;
+  if (!text) return;
 
-  addMsg(text,"user");
+  addMsg(text, "user");
   input.value = "";
 
   const loading = document.createElement("div");
@@ -152,36 +153,35 @@ async function send(){
 
   try {
     const res = await fetch("http://127.0.0.1:3000/chat", {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        message:text,
-        context:context
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: text,
+        context: context
       })
     });
 
     const data = await res.json();
 
     messages.removeChild(loading);
-    addMsg(data.reply,"ai");
+    addMsg(data.reply || "No response", "ai");
 
-  } catch(err){
+  } catch (err) {
     messages.removeChild(loading);
-    addMsg("Connection error ❌ Check server", "ai");
+    addMsg("❌ Server error. Check backend.", "ai");
   }
 }
 
-// ⌨️ Enter key
-function handleKey(e){
-  if(e.key==="Enter") send();
+// Enter key support
+function handleKey(e) {
+  if (e.key === "Enter") send();
 }
 
-// 🎯 Navigate
-function goToQuiz(){
+// Quiz navigation
+function goToQuiz() {
   window.location.href = "quiz.html";
 }
 
 </script>
-
 </body>
 </html>
