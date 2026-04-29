@@ -1,6 +1,5 @@
 // Pathfindr — Main JavaScript File
 // This file controls all logic: marks, quiz, Claude API calls, and results.
-<<<<<<< HEAD
 
 document.addEventListener('DOMContentLoaded', () => {
   const marksForm = document.getElementById('marksForm');
@@ -36,12 +35,58 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
-=======
-// i am adding some lines in it to test the commit and push functionality of git
+// ======================
+// CHATBOT FUNCTION
+// ======================
 
-// Global variables
-let marks = [];
-let quizData = [];
-let currentQuestionIndex = 0;
-let userAnswers = [];
->>>>>>> origin/ayushi-work
+async function sendMessage() {
+
+    const input = document.getElementById("userInput");
+
+    const message = input.value.trim();
+
+    if (!message) return;
+
+    try {
+
+        const response = await fetch("http://localhost:3000/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                message: message,
+                context: ""
+            }),
+        });
+
+        const data = await response.json();
+
+        console.log("AI Response:", data);
+
+        // Show AI reply
+        const chatBox = document.getElementById("chatBox");
+
+        const aiMessage = document.createElement("div");
+
+        aiMessage.innerHTML = `
+            <div style="
+                background:#ddd;
+                padding:12px;
+                border-radius:12px;
+                margin:10px;
+                max-width:80%;
+            ">
+                ${data.reply}
+            </div>
+        `;
+
+        chatBox.appendChild(aiMessage);
+
+    } catch (error) {
+
+        console.error("Frontend Error:", error);
+
+        alert("Frontend connection failed");
+    }
+}

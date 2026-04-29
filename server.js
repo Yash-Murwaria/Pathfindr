@@ -36,42 +36,57 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // ✅ CHAT ROUTE
 app.post("/chat", async (req, res) => {
-  console.log("📩 Incoming request:", req.body);
+
   try {
+
+    console.log("📩 Incoming request:", req.body);
+
     const { message, context } = req.body;
 
     if (!message) {
-      console.log("⚠️ No message in request body");
-      return res.json({ reply: "No message received ❌" });
+      return res.json({
+        reply: "No message received ❌"
+      });
     }
 
-    const model = genAI.getGenerativeModel({
-    
-    });
-
+    // ✅ PROMPT
     const prompt = `
-You are a smart career guidance AI.
+You are Pathfindr AI, a smart career guidance assistant.
 
-Student Data:
-${context || "No data provided"}
+Student Context:
+${context}
 
 User Question:
 ${message}
 
-Give clear, helpful, practical advice in simple language.
+Give clear, simple and helpful career guidance.
 `;
 
-    console.log("🤖 Sending prompt to Gemini...");
+    // ✅ MODEL
+    const model = genAI.getGenerativeModel({
+      model: "models/gemini-2.0-flash",
+    });
+
+    // ✅ GEMINI RESPONSE
     const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
-    console.log("✅ Gemini responded successfully");
 
-    res.json({ reply: text });
+    // ✅ TEXT
+    const reply = result.response.text();
 
-  } catch (err) {
-    console.error("❌ BACKEND ERROR:", err);
-    res.status(500).json({ reply: "Server error ❌", error: err.message });
+    console.log("✅ AI Reply:", reply);
+
+    // ✅ SEND TO FRONTEND
+    res.json({
+      reply: reply
+    });
+
+  } catch (error) {
+
+    console.error("❌ BACKEND ERROR:", error);
+
+    res.status(500).json({
+      reply: "Backend failed ❌"
+    });
   }
 });
 
