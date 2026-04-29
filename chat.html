@@ -114,7 +114,7 @@ body {
   </div>
 </div>
 <script>
-
+let chatHistory = [];
 const messages = document.getElementById("messages");
 
 // User context (optional)
@@ -145,6 +145,10 @@ async function send() {
 
   addMsg(text, "user");
   input.value = "";
+  chatHistory.push({
+  role: "user",
+  content: text
+});
 
   const loading = document.createElement("div");
   loading.className = "msg ai";
@@ -156,9 +160,10 @@ async function send() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        message: text,
-        context: context
-      })
+  message: text,
+  context: context,
+  history: chatHistory
+})
     });
 
     const data = await res.json();
