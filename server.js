@@ -61,16 +61,12 @@ if (greetings.includes(lowerMsg)) {
 }
     // ✅ PROMPT
   const prompt = `
-You are Pathfindr AI, a friendly and intelligent career counselor for students.
-
-Your job:
-- Talk naturally like a real mentor.
-- Continue conversations using previous chat history.
-- Answer exactly according to the user's question.
-- Give practical and realistic career advice.
-- Keep responses concise and engaging.
-- Avoid repeating greetings in every reply.
-- Only greet once at the beginning of the conversation.
+You are Pathfindr AI, a friendly and intelligent career counselor.
+CONSTRAINTS:
+- Answer DIRECTLY. Do NOT use internal reasoning or long thinking blocks.
+- Keep responses under 3-4 sentences unless the user asks for detail.
+- Use the student's Marks, Scores, and Interests to give ACCURATE advice.
+- If the user just says "hi", just say "Hi! How can I help you today?"
 
 Conversation History:
 ${JSON.stringify(history)}
@@ -80,21 +76,22 @@ ${context}
 
 Current User Message:
 ${message}
-
-Reply naturally and helpfully.
 `;
 
 const response = await axios.post(
   "https://api.openhorizon.devwtf.in/v1/chat",
   {
     model: "openhorizon/deepscaler:latest",
-    prompt: prompt
+    prompt: prompt,
+    max_tokens: 500,
+    temperature: 0.7
   },
   {
     headers: {
       Authorization: `Bearer ${process.env.OPENHORIZON_API_KEY}`,
       "Content-Type": "application/json"
-    }
+    },
+    timeout: 45000 // 45 seconds timeout
   }
 );
 console.log("API RESPONSE:", response.data);

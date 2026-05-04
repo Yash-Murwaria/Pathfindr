@@ -105,7 +105,7 @@ body {
 <div class="chat">
   <div class="header">
     <span>Pathfindr AI 🤖</span>
-    <button onclick="goToQuiz()">Quiz 🎯</button>
+    <button onclick="goToExplore()">Explore Careers 🗺️</button>
   </div>
   <div id="messages" class="messages"></div>
   <div class="input-area">
@@ -116,14 +116,6 @@ body {
 <script>
 let chatHistory = [];
 const messages = document.getElementById("messages");
-
-// User context (optional)
-const context = `
-Marks: ${localStorage.getItem("marks") || "N/A"}
-Scores: ${localStorage.getItem("scores") || "N/A"}
-Stream: ${localStorage.getItem("topStream") || "N/A"}
-Interests: ${localStorage.getItem("interests") || "N/A"}
-`;
 
 // Welcome message
 addMsg("Hey! I'm Pathfindr AI 🤖\nAsk me anything about your career or studies.", "ai");
@@ -142,6 +134,14 @@ async function send() {
   const input = document.getElementById("input");
   const text = input.value.trim();
   if (!text) return;
+
+  // Construct context dynamically to get latest data
+  const context = `
+Marks: ${localStorage.getItem("userMarks") || "N/A"}
+Scores: ${localStorage.getItem("scores") || "N/A"}
+Stream: ${localStorage.getItem("topStream") || "N/A"}
+Interests: ${localStorage.getItem("interests") || "N/A"}
+`;
 
   addMsg(text, "user");
   input.value = "";
@@ -167,13 +167,18 @@ async function send() {
     });
 
     const data = await res.json();
-
     messages.removeChild(loading);
-    addMsg(data.reply || "No response", "ai");
+
+    if (data.reply) {
+      addMsg(data.reply, "ai");
+      chatHistory.push({ role: "assistant", content: data.reply });
+    } else {
+      addMsg("⚠️ No response from AI. Try again.", "ai");
+    }
 
   } catch (err) {
     messages.removeChild(loading);
-    addMsg("❌ Server error. Check backend.", "ai");
+    addMsg("❌ Backend is offline or taking too long. Please try again.", "ai");
   }
 }
 
@@ -182,9 +187,9 @@ function handleKey(e) {
   if (e.key === "Enter") send();
 }
 
-// Quiz navigation
-function goToQuiz() {
-  window.location.href = "quiz.html";
+// Explore navigation
+function goToExplore() {
+  window.location.href = "explore.html";
 }
 
 </script>

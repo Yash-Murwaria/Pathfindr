@@ -155,6 +155,22 @@ input {
 
 // 🎯 Redirect to interest page
 function goToInterest(){
+  const marks = {
+    english: document.getElementById("english").value,
+    hindi: document.getElementById("hindi").value,
+    maths: document.getElementById("maths").value,
+    science: document.getElementById("science").value,
+    social: document.getElementById("social").value,
+    computer: document.getElementById("computer").value
+  };
+
+  // Check if all marks are entered
+  if (Object.values(marks).some(v => v === "")) {
+    alert("Please enter all marks!");
+    return;
+  }
+
+  localStorage.setItem("userMarks", JSON.stringify(marks));
   window.location.href = "interest.html";
 }
 

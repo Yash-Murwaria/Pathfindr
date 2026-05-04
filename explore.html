@@ -498,6 +498,35 @@
       color: #72E296;
       margin-bottom: 14px;
     }
+
+    /* ── NEXT BUTTON ── */
+    .footer-actions {
+      display: flex;
+      justify-content: center;
+      padding: 40px 0;
+    }
+    .next-btn {
+      background: var(--parch-warm);
+      color: var(--ink);
+      border: none;
+      padding: 12px 30px;
+      border-radius: 30px;
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(212,168,67,0.3);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .next-btn:hover {
+      background: var(--parch-deep);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(212,168,67,0.4);
+    }
+    .next-btn i { font-size: 0.9rem; }
     .modal-suited {
       background: rgba(210,150,40,0.08);
       border-left: 3px solid rgba(210,150,40,0.5);
@@ -654,6 +683,13 @@
       </div>
 
     </div><!-- .flowchart -->
+
+    <!-- NEXT BUTTON -->
+    <div class="footer-actions">
+      <button class="next-btn" onclick="goToAnalyze()">
+        Final Analysis 🔍 <i class="fas fa-arrow-right"></i>
+      </button>
+    </div>
 
     <div class="scroll-hint">
       Tap any career card to learn more
@@ -938,6 +974,10 @@
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') closeModal();
     });
+
+    function goToAnalyze() {
+      window.location.href = "analyze.html";
+    }
   </script>
 
 </body>

@@ -253,11 +253,11 @@ h1 {
   </div>
 
   <button class="btn" id="nextBtn" disabled>
-    Talk to Pathfindr AI 🤖 <i class="fas fa-arrow-right"></i>
+    Take Mind Assessment 🧠 <i class="fas fa-arrow-right"></i>
   </button>
 
   <div class="skip-container">
-    <a href="chat.html" class="skip" onclick="skipSelection()">Skip for now</a>
+    <a href="quiz.html" class="skip" onclick="skipSelection()">Skip for now</a>
   </div>
 </div>
 
@@ -358,12 +358,12 @@ btn.onclick = ()=>{
     .map(i => i.label);
     
   localStorage.setItem("interests", JSON.stringify(selectedLabels));
-  window.location.href = "chat.html";
+  window.location.href = "quiz.html";
 };
 
 function skipSelection() {
   localStorage.setItem("interests", JSON.stringify(["None provided"]));
-  window.location.href = "chat.html";
+  window.location.href = "quiz.html";
 }
 
 /* INIT */
