@@ -1,687 +1,818 @@
 <!DOCTYPE html>
-<!-- saved from url=(0034)http://127.0.0.1:5500/analyze.html -->
-<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
+<html lang="en">
+<head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Step 6 — AI Analyses Everything</title>
-<link href="./Step 6 — AI Analyses Everything_files/css2" rel="stylesheet">
+<title>AI Stream Analyser</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
   :root {
-    --amber-50: #fffbf2;
-    --amber-100: #fef3d0;
-    --amber-200: #fde68a;
-    --amber-300: #fcd34d;
-    --amber-400: #f59e0b;
-    --amber-500: #d97706;
-    --amber-600: #b45309;
-    --amber-700: #92400e;
-    --amber-800: #78350f;
-    --text-dark: #1c1009;
-    --text-mid: #5c3d1e;
-    --text-soft: #9a7040;
-    --border: #f0d9a8;
-    --surface: #fff;
-    --bg: #fffbf2;
+    --cream: #F5F0E8;
+    --cream-dark: #EDE6D6;
+    --gold-light: #E8C96A;
+    --gold-mid: #C8971A;
+    --gold-dark: #8B5E0A;
+    --brown-deep: #5C3D0E;
+    --brown-text: #4A2E08;
+    --border-gold: #D4A843;
+    --border-light: #E0D0B0;
+    --white-card: #FDFAF4;
+    --tag-bg: #F0E8D0;
+    --badge-best-bg: #F5E8C0;
+    --badge-best-text: #7A4F10;
+    --text-muted: #8B7355;
+    --text-body: #3D2B0E;
   }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
   body {
+    background: var(--cream);
     font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text-dark);
+    color: var(--text-body);
     min-height: 100vh;
   }
 
-  /* TOP BAR */
-  .topbar {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 0 2rem;
+  /* ── HEADER ── */
+  .top-bar {
+    background: var(--brown-deep);
+    padding: 14px 32px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 60px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
   }
-  .topbar-logo {
-    font-family: 'DM Serif Display', serif;
-    font-size: 20px;
-    color: var(--amber-600);
-    letter-spacing: -0.3px;
+  .top-bar .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: var(--gold-light);
+    letter-spacing: 0.02em;
   }
-  .topbar-steps { display: flex; align-items: center; gap: 4px; }
-  .step-dot { width: 28px; height: 6px; border-radius: 3px; background: var(--amber-100); }
-  .step-dot.done { background: var(--amber-400); }
-  .step-dot.active { background: var(--amber-600); }
-  .topbar-label { font-size: 13px; color: var(--text-soft); font-weight: 500; }
+  .top-bar .logo span { color: #fff; font-weight: 300; }
+  .top-bar nav a {
+    color: #D4C4A0;
+    text-decoration: none;
+    font-size: 13px;
+    margin-left: 24px;
+    font-weight: 400;
+    letter-spacing: 0.03em;
+  }
+  .top-bar nav a:hover { color: var(--gold-light); }
 
-  /* PAGE */
-  .page { max-width: 820px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+  /* ── PAGE LAYOUT ── */
+  .page { max-width: 900px; margin: 0 auto; padding: 36px 24px 60px; }
 
-  /* HEADER */
-  .page-header { margin-bottom: 2rem; animation: fadeUp 0.5s ease both; }
-  .badge {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: var(--amber-100); color: var(--amber-700);
-    font-size: 11px; font-weight: 600; padding: 4px 12px;
-    border-radius: 20px; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 12px;
+  /* ── HERO SECTION ── */
+  .hero { margin-bottom: 32px; }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 34px;
+    font-weight: 700;
+    color: var(--brown-text);
+    line-height: 1.2;
+    margin-bottom: 8px;
   }
-  .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--amber-500); }
-  .page-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 32px; color: var(--text-dark);
-    letter-spacing: -0.5px; margin-bottom: 8px; line-height: 1.2;
+  .hero p {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.7;
+    max-width: 560px;
   }
-  .page-sub { font-size: 15px; color: var(--text-soft); line-height: 1.6; max-width: 560px; }
+  .hero p strong { color: var(--brown-deep); font-weight: 500; }
 
-  /* SNAPSHOT */
-  .snapshot-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 12px; margin-bottom: 1.5rem; animation: fadeUp 0.5s 0.1s ease both;
-  }
-  .snap-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 14px; padding: 16px 18px; position: relative; overflow: hidden;
-  }
-  .snap-card::after {
-    content: ''; position: absolute; bottom: 0; left: 0; right: 0;
-    height: 3px; background: linear-gradient(90deg, var(--amber-300), var(--amber-500));
-  }
-  .snap-label { font-size: 11px; font-weight: 600; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
-  .snap-val { font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--amber-700); line-height: 1; margin-bottom: 4px; }
-  .snap-sub { font-size: 12px; color: var(--text-soft); }
-
-  /* MARKS */
-  .marks-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem;
-    animation: fadeUp 0.5s 0.2s ease both;
-  }
-  .card-heading {
-    font-size: 12px; font-weight: 600; color: var(--text-soft);
-    text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1.25rem;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .card-heading::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-  .bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-  .bar-subj { font-size: 13px; font-weight: 500; color: var(--text-mid); width: 100px; flex-shrink: 0; }
-  .bar-track { flex: 1; height: 9px; background: var(--amber-100); border-radius: 5px; overflow: hidden; }
-  .bar-fill { height: 100%; border-radius: 5px; background: linear-gradient(90deg, var(--amber-300), var(--amber-600)); width: 0; transition: width 1.3s cubic-bezier(0.4,0,0.2,1); }
-  .bar-num { font-size: 13px; font-weight: 600; color: var(--amber-700); width: 36px; text-align: right; flex-shrink: 0; }
-
-  /* BUTTON */
-  .btn-wrap { margin-bottom: 1.5rem; animation: fadeUp 0.5s 0.3s ease both; }
-  .analyse-btn {
-    width: 100%; padding: 16px 24px; background: var(--amber-600);
-    color: #fff; border: none; border-radius: 14px;
-    font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 600;
-    cursor: pointer; letter-spacing: 0.02em; transition: background 0.2s, transform 0.15s;
-    display: flex; align-items: center; justify-content: center; gap: 10px;
-  }
-  .analyse-btn:hover { background: var(--amber-700); transform: translateY(-1px); }
-  .analyse-btn:active { transform: translateY(0); }
-  .analyse-btn:disabled { background: var(--amber-200); color: var(--amber-600); cursor: not-allowed; transform: none; }
-
-  /* LOADING */
-  .loading-box {
-    display: none; background: var(--amber-100); border: 1px solid var(--amber-200);
-    border-radius: 14px; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem;
-    align-items: flex-start; gap: 14px;
-  }
-  .loading-box.show { display: flex; }
-  .spinner {
-    width: 20px; height: 20px; border: 2.5px solid var(--amber-200);
-    border-top-color: var(--amber-600); border-radius: 50%;
-    animation: spin 0.75s linear infinite; flex-shrink: 0; margin-top: 2px;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .loading-steps { flex: 1; }
-  .loading-step {
-    font-size: 13px; color: var(--text-mid); font-weight: 500;
-    padding: 3px 0; opacity: 0; transform: translateY(4px);
-    transition: opacity 0.3s, transform 0.3s; display: flex; align-items: center; gap: 8px;
-  }
-  .loading-step.done { opacity: 0.5; transform: none; }
-  .loading-step.active { opacity: 1; transform: none; color: var(--amber-700); font-weight: 600; }
-
-  /* RESULTS */
-  .results { display: none; }
-  .results.show { display: block; animation: fadeUp 0.5s ease both; }
+  /* ── SECTION LABEL ── */
   .section-label {
-    font-size: 12px; font-weight: 600; color: var(--text-soft);
-    text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 14px;
-    display: flex; align-items: center; gap: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold-dark);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
-  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border-light);
+  }
 
-  /* STREAM CARDS */
-  .stream-cards { display: flex; flex-direction: column; gap: 14px; margin-bottom: 1.75rem; }
+  /* ── SUMMARY METRIC CARDS ── */
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .metric-card {
+    background: var(--white-card);
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+  .metric-card .m-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .metric-card .m-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--brown-text);
+    line-height: 1.1;
+  }
+  .metric-card .m-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 3px;
+  }
+
+  /* ── SUBJECT MARKS CARD ── */
+  .marks-card {
+    background: var(--white-card);
+    border: 1px solid var(--border-light);
+    border-radius: 14px;
+    padding: 22px 24px;
+    margin-bottom: 28px;
+  }
+  .marks-inner-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 18px;
+  }
+  .subject-row {
+    display: grid;
+    grid-template-columns: 150px 1fr 48px;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+  .subject-row:last-child { margin-bottom: 0; }
+  .subject-name { font-size: 14px; color: var(--text-body); font-weight: 400; }
+  .bar-track {
+    height: 10px;
+    background: #EDE6D6;
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 10px;
+    border-radius: 5px;
+    background: linear-gradient(90deg, #E8C96A 0%, #C8971A 50%, #8B5E0A 100%);
+    transition: width 0.6s cubic-bezier(.4,0,.2,1);
+  }
+  .subject-pct {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--brown-text);
+    text-align: right;
+  }
+
+  /* ── SLIDER INPUT VERSION ── */
+  .subject-row-input {
+    display: grid;
+    grid-template-columns: 150px 1fr 52px;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+  input[type=range] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 10px;
+    background: #EDE6D6;
+    border-radius: 5px;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--gold-mid);
+    border: 2px solid #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    cursor: pointer;
+  }
+  .range-wrapper { position: relative; }
+  .range-fill-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    height: 10px;
+    border-radius: 5px;
+    background: linear-gradient(90deg, #E8C96A 0%, #C8971A 50%, #8B5E0A 100%);
+    pointer-events: none;
+    transition: width 0.1s;
+  }
+
+  /* ── PERSONALITY SELECT ── */
+  .personality-wrap {
+    background: var(--white-card);
+    border: 1px solid var(--border-light);
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .pers-icon-box {
+    width: 54px;
+    height: 54px;
+    border-radius: 14px;
+    background: var(--badge-best-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .pers-text .pers-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--brown-text);
+    margin-bottom: 4px;
+  }
+  .pers-text .pers-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; max-width: 360px; }
+  select.pers-select {
+    margin-left: auto;
+    padding: 10px 14px;
+    border: 1px solid var(--border-gold);
+    border-radius: 8px;
+    background: var(--cream);
+    color: var(--brown-text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    outline: none;
+    min-width: 180px;
+  }
+
+  /* ── ANALYZE BUTTON ── */
+  .analyze-btn {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #8B5E0A 0%, #5C3D0E 100%);
+    color: #F5E8C0;
+    border: none;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    margin-bottom: 36px;
+    transition: opacity 0.2s, transform 0.15s;
+  }
+  .analyze-btn:hover { opacity: 0.92; transform: translateY(-1px); }
+  .analyze-btn:active { transform: scale(0.99); }
+  .analyze-btn .btn-icon { margin-left: 8px; font-size: 15px; }
+
+  /* ── RESULTS FOOTER ── */
+  .results-footer {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    justify-content: center;
+  }
+  .view-roadmap-btn {
+    padding: 14px 40px;
+    background: linear-gradient(135deg, #8B5E0A 0%, #5C3D0E 100%);
+    color: #F5E8C0;
+    border: none;
+    border-radius: 30px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .view-roadmap-btn:hover { opacity: 0.92; transform: translateY(-2px); }
+
+  /* ── STREAM RESULT CARDS ── */
   .stream-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 16px; padding: 1.5rem; position: relative; overflow: hidden;
-    transition: box-shadow 0.2s;
+    background: var(--white-card);
+    border: 1px solid var(--border-light);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 16px;
+    position: relative;
   }
-  .stream-card:hover { box-shadow: 0 4px 20px rgba(180,83,9,0.08); }
-  .stream-card.top-pick { border-color: var(--amber-400); }
-  .stream-card.top-pick::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0;
-    height: 3px; background: linear-gradient(90deg, var(--amber-300), var(--amber-600));
+  .stream-card.best-match {
+    border: 1.5px solid var(--border-gold);
   }
-  .stream-top-row {
-    display: flex; align-items: flex-start; justify-content: space-between;
-    margin-bottom: 10px; gap: 12px;
+  .stream-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    gap: 12px;
   }
-  .stream-rank-badge {
-    font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px;
-    text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; flex-shrink: 0;
-  }
-  .rank-1 { background: var(--amber-200); color: var(--amber-800); }
-  .rank-2 { background: var(--amber-100); color: var(--amber-700); }
-  .rank-3 { background: #f5f5f5; color: #777; }
   .stream-name {
-    font-family: 'DM Serif Display', serif; font-size: 22px;
-    color: var(--text-dark); margin-bottom: 10px; line-height: 1.1;
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--brown-text);
   }
-  .compat-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
-  .compat-track { flex: 1; height: 8px; background: var(--amber-100); border-radius: 4px; overflow: hidden; }
-  .compat-fill {
-    height: 100%; border-radius: 4px;
-    background: linear-gradient(90deg, var(--amber-300), var(--amber-600));
-    width: 0; transition: width 1.4s cubic-bezier(0.4,0,0.2,1);
+  .match-badge {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 5px 13px;
+    border-radius: 20px;
+    flex-shrink: 0;
+    margin-top: 4px;
   }
-  .compat-pct { font-size: 14px; font-weight: 700; color: var(--amber-700); width: 44px; text-align: right; flex-shrink: 0; }
-  .ai-reason {
-    font-size: 14px; color: var(--text-mid); line-height: 1.7; margin-bottom: 14px;
-    padding: 12px 14px; background: var(--amber-50); border-radius: 10px;
-    border-left: 3px solid var(--amber-400);
-  }
-  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 4px; }
-  .info-box { background: var(--amber-50); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
-  .info-box-label { font-size: 11px; font-weight: 600; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
-  .career-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-  .chip { font-size: 12px; font-weight: 500; background: var(--surface); color: var(--amber-700); border: 1px solid var(--amber-200); border-radius: 20px; padding: 4px 11px; }
-  .salary-row { display: flex; gap: 12px; flex-wrap: wrap; }
-  .sal-col { display: flex; flex-direction: column; gap: 3px; }
-  .sal-label { font-size: 11px; color: var(--text-soft); }
-  .sal-val { font-size: 14px; font-weight: 600; color: var(--text-dark); }
+  .badge-best { background: var(--badge-best-bg); color: var(--badge-best-text); border: 1px solid #D4B060; }
+  .badge-second { background: #EEE4CC; color: #6B4A12; border: 1px solid #C8A85A; }
+  .badge-third { background: #E8E0D0; color: #7A6A50; border: 1px solid #C0B090; }
+  .badge-fourth { background: #E0DAD0; color: #706050; border: 1px solid #B8AD98; }
 
-  /* PERSONALITY BREAKDOWN */
-  .personality-section { margin-bottom: 1.75rem; }
-  .personality-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; }
-  .personality-header { display: flex; align-items: center; gap: 14px; margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
-  .personality-type-badge {
-    background: var(--amber-100); color: var(--amber-800);
-    font-size: 13px; font-weight: 700; padding: 6px 16px; border-radius: 20px; letter-spacing: 0.03em;
+  .match-pct-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
   }
-  .personality-tagline { font-size: 13px; color: var(--text-soft); line-height: 1.5; }
-  .quiz-breakdown { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.25rem; }
-  .quiz-cat-card {
-    background: var(--amber-50); border: 1px solid var(--border); border-radius: 12px;
-    padding: 14px; text-align: center; position: relative; overflow: hidden;
+  .match-pct-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--gold-dark);
   }
-  .quiz-cat-card.dominant { border-color: var(--amber-400); }
-  .quiz-cat-card.dominant::after {
-    content: 'Dominant'; position: absolute; top: 6px; right: 8px;
-    font-size: 9px; font-weight: 700; color: var(--amber-600); letter-spacing: 0.05em; text-transform: uppercase;
+  .match-bar-track {
+    height: 10px;
+    background: #EDE6D6;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 16px;
   }
-  .quiz-cat-icon { font-size: 20px; margin-bottom: 6px; }
-  .quiz-cat-name { font-size: 11px; font-weight: 600; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
-  .quiz-cat-score { font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--amber-700); line-height: 1; margin-bottom: 4px; }
-  .quiz-cat-max { font-size: 11px; color: var(--text-soft); }
-  .quiz-cat-bar { height: 5px; background: var(--amber-100); border-radius: 3px; margin-top: 8px; overflow: hidden; }
-  .quiz-cat-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--amber-300), var(--amber-600)); transition: width 1.4s cubic-bezier(0.4,0,0.2,1); }
-  .personality-insight { background: var(--amber-50); border-left: 3px solid var(--amber-400); border-radius: 0 10px 10px 0; padding: 12px 14px; font-size: 13px; color: var(--text-mid); line-height: 1.65; }
+  .match-bar-fill {
+    height: 10px;
+    border-radius: 5px;
+    background: linear-gradient(90deg, #E8C96A 0%, #C8971A 50%, #8B5E0A 100%);
+    transition: width 0.8s cubic-bezier(.4,0,.2,1);
+  }
 
-  /* DISCLAIMER & NEXT */
-  .disclaimer {
-    background: var(--amber-50); border: 1px solid var(--border); border-radius: 12px;
-    padding: 1rem 1.25rem; font-size: 13px; color: var(--text-soft); line-height: 1.65;
-    margin-bottom: 1.5rem; display: flex; gap: 10px; align-items: flex-start;
+  /* reason blockquote */
+  .reason-box {
+    border-left: 3px solid var(--border-gold);
+    padding: 12px 16px;
+    margin-bottom: 18px;
+    background: #FAF5EA;
+    border-radius: 0 8px 8px 0;
   }
-  .disc-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
-  .next-btn {
-    width: 100%; padding: 15px 24px; background: var(--text-dark); color: #fff;
-    border: none; border-radius: 14px; font-family: 'DM Sans', sans-serif;
-    font-size: 15px; font-weight: 600; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; gap: 10px; transition: background 0.2s;
+  .reason-box p { font-size: 13px; line-height: 1.75; color: var(--text-body); }
+
+  /* career + salary row */
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
   }
-  .next-btn:hover { background: var(--amber-800); }
+  .info-box {
+    background: var(--cream);
+    border: 1px solid var(--border-light);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .info-box-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+  .career-tags { display: flex; flex-wrap: wrap; gap: 7px; }
+  .career-tag {
+    font-size: 12px;
+    padding: 4px 12px;
+    border: 1px solid var(--border-light);
+    border-radius: 20px;
+    background: var(--white-card);
+    color: var(--text-body);
+    font-weight: 400;
+  }
+  .salary-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .sal-col { text-align: center; }
+  .sal-stage { font-size: 10px; color: var(--text-muted); margin-bottom: 3px; }
+  .sal-amt { font-size: 13px; font-weight: 600; color: var(--brown-text); }
 
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  /* ── PERSONALITY ANALYSIS SECTION ── */
+  .aptitude-section {
+    margin-top: 36px;
+    padding-top: 28px;
+    border-top: 1px solid var(--border-light);
+  }
+  .aptitude-intro {
+    background: var(--white-card);
+    border: 1px solid var(--border-light);
+    border-radius: 14px;
+    padding: 20px 22px;
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    margin-bottom: 20px;
+  }
+  .aptitude-icon-box {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: var(--badge-best-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .aptitude-intro-text { font-size: 13px; color: var(--text-body); line-height: 1.7; }
+  .aptitude-intro-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--brown-text);
+    margin-bottom: 5px;
+  }
 
-  @media (max-width: 540px) {
-    .snapshot-grid { grid-template-columns: 1fr 1fr; }
+  .aptitude-cols {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .apt-col {
+    background: var(--white-card);
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    padding: 18px 16px;
+    text-align: center;
+  }
+  .apt-icon { font-size: 22px; margin-bottom: 8px; }
+  .apt-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold-dark);
+    margin-bottom: 6px;
+  }
+  .apt-score {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--brown-text);
+  }
+  .apt-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: var(--brown-deep);
+    text-align: center;
+    padding: 18px;
+    font-size: 12px;
+    color: #A09070;
+    margin-top: 48px;
+  }
+
+  /* ── HIDDEN ── */
+  .results-section { display: none; }
+  .results-section.visible { display: block; }
+
+  @media (max-width: 600px) {
+    .metrics-grid { grid-template-columns: 1fr 1fr; }
     .info-grid { grid-template-columns: 1fr; }
-    .page-title { font-size: 26px; }
-    .stream-name { font-size: 20px; }
-    .topbar-steps { display: none; }
-    .page { padding: 1.5rem 1rem 3rem; }
+    .aptitude-cols { grid-template-columns: 1fr 1fr; }
+    .subject-row, .subject-row-input { grid-template-columns: 110px 1fr 44px; }
+    .top-bar nav { display: none; }
   }
 </style>
 </head>
 <body>
 
 <!-- TOP BAR -->
-<div class="topbar">
-  <div class="topbar-logo">StreamAI</div>
-  <div class="topbar-steps">
-    <div class="step-dot done"></div>
-    <div class="step-dot done"></div>
-    <div class="step-dot done"></div>
-    <div class="step-dot done"></div>
-    <div class="step-dot done"></div>
-    <div class="step-dot active"></div>
-    <div class="step-dot"></div>
-    <div class="step-dot"></div>
-  </div>
-  <div class="topbar-label">Step 6 of 8</div>
+<div class="top-bar">
+  <div class="logo">Path<span>Finder</span> <span style="font-size:13px;color:#A09070;font-family:'DM Sans';font-weight:300;">AI</span></div>
+  <nav>
+    <a href="#">Home</a>
+    <a href="#">About</a>
+    <a href="#">How It Works</a>
+    <a href="#">Contact</a>
+  </nav>
 </div>
 
+<!-- MAIN PAGE -->
 <div class="page">
 
-  <!-- HEADER -->
-  <div class="page-header">
-    <div class="badge"><div class="badge-dot"></div> Step 6 of 8 — New</div>
-    <div class="page-title">AI Analyses Everything</div>
-    <div class="page-sub">Tumhare academic marks, personality quiz results (Step 5), aur AI chat history — teeno milake ek personalised stream recommendation generate hoti hai.</div>
+  <!-- HERO -->
+  <div class="hero">
+    <h1>AI Analyses Everything</h1>
+    <p>Tumhare academic marks, personality quiz results, aur AI chat history —<br>
+    <strong>teeno milake ek personalised stream recommendation generate hoti hai.</strong></p>
   </div>
 
-  <!-- SNAPSHOT -->
-  <div class="snapshot-grid">
-    <div class="snap-card">
-      <div class="snap-label">Academic Score</div>
-      <div id="avgScore" class="snap-val">--%</div>
-      <div class="snap-sub">Weighted average</div>
+  <!-- SUMMARY METRICS -->
+  <div class="section-label">Overview</div>
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="m-label">Academic Score</div>
+      <div class="m-value" id="metricAvg">—</div>
+      <div class="m-sub">Weighted average</div>
     </div>
-    <div class="snap-card">
-      <div class="snap-label">Personality Type</div>
-      <div id="personalityType" class="snap-val" style="font-size:20px;margin-top:4px;">--</div>
-      <div class="snap-sub">Thinking style</div>
+    <div class="metric-card">
+      <div class="m-label">Personality Type</div>
+      <div class="m-value" id="metricPers" style="font-size:20px;">Analytical</div>
+      <div class="m-sub">Thinking style</div>
     </div>
-    <div class="snap-card">
-      <div class="snap-label">Interests</div>
-      <div id="interestCount" class="snap-val">--</div>
-      <div class="snap-sub">Topics selected</div>
-    </div>
-  </div>
-
-  <!-- MARKS -->
-  <div class="marks-card" id="marksCard">
-    <div class="card-heading">Subject-wise Marks</div>
-    <!-- Bars will be injected here -->
-  </div>
-
-  <!-- BUTTON -->
-  <div class="btn-wrap">
-    <button class="analyse-btn" id="analyseBtn" onclick="startAnalysis()">Start AI Analysis 🔍</button>
-  </div>
-
-  <!-- LOADING -->
-  <div class="loading-box" id="loadingBox">
-    <div class="spinner"></div>
-    <div class="loading-steps">
-      <div class="loading-step done" id="ls0">●&nbsp; Sending profile to Claude API...</div>
-      <div class="loading-step done" id="ls1">●&nbsp; Processing marks and weighted scores...</div>
-      <div class="loading-step done" id="ls2">●&nbsp; Analysing personality type and thinking style...</div>
-      <div class="loading-step done" id="ls3">●&nbsp; Reviewing AI chat history for interest signals...</div>
-      <div class="loading-step done" id="ls4">●&nbsp; Generating personalised stream recommendations...</div>
-      <div class="loading-step done" id="ls5">●&nbsp; Calculating career paths and salary data...</div>
-      <div class="loading-step done" id="ls6">●&nbsp; Compiling personalised stream report...</div>
+    <div class="metric-card">
+      <div class="m-label">Subjects</div>
+      <div class="m-value">6</div>
+      <div class="m-sub">Topics entered</div>
     </div>
   </div>
 
-  <!-- RESULTS -->
-  <div class="results show" id="results">
+  <!-- SUBJECT MARKS INPUT -->
+  <div class="section-label">Subject-wise marks</div>
+  <div class="marks-card">
+    <div class="marks-inner-label">Subject-wise marks</div>
+    <div id="subjectInputs"></div>
+  </div>
 
-    <div class="section-label">Stream Recommendations</div>
-    <div class="stream-cards">
-
-      <!-- #1 -->
-      <div class="stream-card top-pick">
-        <div class="stream-top-row">
-          <div class="stream-name">Science (PCM)</div>
-          <span class="stream-rank-badge rank-1">Best Match</span>
-        </div>
-        <div class="compat-row">
-          <div class="compat-track"><div class="compat-fill" data-w="91" style="width: 91%;"></div></div>
-          <span class="compat-pct">91%</span>
-        </div>
-        <div class="ai-reason">Your Mathematics score of 88% and Computer Science score of 90% reflect a strong aptitude for logical and quantitative reasoning. Combined with your Analytical personality profile — which excels at pattern recognition and structured problem-solving — Science (PCM) represents the strongest alignment with your academic strengths and cognitive style. Your AI chat history also revealed consistent curiosity around technology and engineering topics.</div>
-        <div class="info-grid">
-          <div class="info-box">
-            <div class="info-box-label">Top Career Paths</div>
-            <div class="career-chips">
-              <span class="chip">Software Engineer</span>
-              <span class="chip">Data Scientist</span>
-              <span class="chip">Mechanical Eng.</span>
-              <span class="chip">Research Analyst</span>
-            </div>
-          </div>
-          <div class="info-box">
-            <div class="info-box-label">Salary Projections</div>
-            <div class="salary-row">
-              <div class="sal-col"><span class="sal-label">Starting</span><span class="sal-val">₹4–8 LPA</span></div>
-              <div class="sal-col"><span class="sal-label">Mid-career</span><span class="sal-val">₹12–25 LPA</span></div>
-              <div class="sal-col"><span class="sal-label">Senior</span><span class="sal-val">₹30–60 LPA</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- #2 -->
-      <div class="stream-card">
-        <div class="stream-top-row">
-          <div class="stream-name">Science (PCB)</div>
-          <span class="stream-rank-badge rank-2">Second Match</span>
-        </div>
-        <div class="compat-row">
-          <div class="compat-track"><div class="compat-fill" data-w="74" style="width: 74%;"></div></div>
-          <span class="compat-pct">74%</span>
-        </div>
-        <div class="ai-reason">Your Science score of 82% shows solid potential in biological sciences. However, your AI chat history reflects a stronger interest in technology and computing, which aligns less directly with PCB. This stream remains a viable option if your interest shifts toward medicine or life sciences in the future.</div>
-        <div class="info-grid">
-          <div class="info-box">
-            <div class="info-box-label">Top Career Paths</div>
-            <div class="career-chips">
-              <span class="chip">MBBS / Doctor</span>
-              <span class="chip">Pharmacist</span>
-              <span class="chip">Biotech Researcher</span>
-            </div>
-          </div>
-          <div class="info-box">
-            <div class="info-box-label">Salary Projections</div>
-            <div class="salary-row">
-              <div class="sal-col"><span class="sal-label">Starting</span><span class="sal-val">₹3–6 LPA</span></div>
-              <div class="sal-col"><span class="sal-label">Mid-career</span><span class="sal-val">₹10–20 LPA</span></div>
-              <div class="sal-col"><span class="sal-label">Senior</span><span class="sal-val">₹25–50 LPA</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- #3 -->
-      <div class="stream-card">
-        <div class="stream-top-row">
-          <div class="stream-name">Commerce</div>
-          <span class="stream-rank-badge rank-3">Third Match</span>
-        </div>
-        <div class="compat-row">
-          <div class="compat-track"><div class="compat-fill" data-w="58" style="width: 58%;"></div></div>
-          <span class="compat-pct">58%</span>
-        </div>
-        <div class="ai-reason">Your Mathematics strength is transferable to Commerce through Accountancy and Economics. However, your personality type and subject preferences suggest a stronger inclination towards technical and scientific disciplines. Commerce is a reasonable alternative if you prefer a less competitive entrance exam pathway.</div>
-        <div class="info-grid">
-          <div class="info-box">
-            <div class="info-box-label">Top Career Paths</div>
-            <div class="career-chips">
-              <span class="chip">CA / CFA</span>
-              <span class="chip">MBA</span>
-              <span class="chip">Financial Analyst</span>
-            </div>
-          </div>
-          <div class="info-box">
-            <div class="info-box-label">Salary Projections</div>
-            <div class="salary-row">
-              <div class="sal-col"><span class="sal-label">Starting</span><span class="sal-val">₹3–6 LPA</span></div>
-              <div class="sal-col"><span class="sal-label">Mid-career</span><span class="sal-val">₹10–18 LPA</span></div>
-              <div class="sal-col"><span class="sal-label">Senior</span><span class="sal-val">₹20–45 LPA</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
+  <!-- PERSONALITY -->
+  <div class="section-label">Personality type</div>
+  <div class="personality-wrap">
+    <div class="pers-icon-box" id="persIconBox">🧠</div>
+    <div class="pers-text">
+      <div class="pers-title" id="persTitleText">Analytical Thinker</div>
+      <div class="pers-desc" id="persDescText">Pattern recognition, structured problem-solving, quantitative reasoning.</div>
     </div>
+    <select class="pers-select" id="personalitySelect" onchange="updatePersonality()">
+      <option value="analytical">Analytical Thinker</option>
+      <option value="logical">Logical Thinker</option>
+      <option value="creative">Creative Thinker</option>
+      <option value="social">Social / Empathetic</option>
+    </select>
+  </div>
 
-    <!-- PERSONALITY QUIZ BREAKDOWN -->
-    <div class="personality-section">
+  <!-- ANALYZE BUTTON -->
+  <button class="analyze-btn" onclick="runAnalysis()">
+    Start AI Analysis <span class="btn-icon">🔍</span>
+  </button>
+
+  <!-- STREAM RECOMMENDATIONS -->
+  <div class="results-section" id="resultsSection">
+    <div class="section-label">Stream recommendations</div>
+    <div id="streamCards"></div>
+
+    <!-- PERSONALITY + APTITUDE ANALYSIS -->
+    <div class="aptitude-section">
       <div class="section-label">Personality + Aptitude Analysis</div>
-      <div class="personality-card">
-
-        <div class="personality-header">
-          <div class="personality-type-badge">🧠 Analytical Thinker</div>
-          <div class="personality-tagline">The following results are derived from your 40-question aptitude assessment (Step 5). Your dominant thinking style has been identified and incorporated directly into the stream compatibility analysis above.</div>
-        </div>
-
-        <div class="quiz-breakdown">
-          <div class="quiz-cat-card dominant">
-            <div class="quiz-cat-icon">🔢</div>
-            <div class="quiz-cat-name">Analytical</div>
-            <div class="quiz-cat-score">13<span style="font-size:14px;color:var(--text-soft)">/13</span></div>
-            <div class="quiz-cat-max">Data interpretation &amp; decision making</div>
-            <div class="quiz-cat-bar"><div class="quiz-cat-fill" style="width:100%"></div></div>
-          </div>
-          <div class="quiz-cat-card">
-            <div class="quiz-cat-icon">🔍</div>
-            <div class="quiz-cat-name">Logical</div>
-            <div class="quiz-cat-score">10<span style="font-size:14px;color:var(--text-soft)">/14</span></div>
-            <div class="quiz-cat-max">Pattern recognition &amp; mathematical reasoning</div>
-            <div class="quiz-cat-bar"><div class="quiz-cat-fill" style="width:71%"></div></div>
-          </div>
-          <div class="quiz-cat-card">
-            <div class="quiz-cat-icon">🎨</div>
-            <div class="quiz-cat-name">Creative</div>
-            <div class="quiz-cat-score">6<span style="font-size:14px;color:var(--text-soft)">/13</span></div>
-            <div class="quiz-cat-max">Open-ended thinking &amp; imagination</div>
-            <div class="quiz-cat-bar"><div class="quiz-cat-fill" style="width:46%"></div></div>
+      <div class="aptitude-intro">
+        <div class="aptitude-icon-box" id="aptIconBox">🧠</div>
+        <div>
+          <div class="aptitude-intro-title" id="aptTitle">Analytical Thinker</div>
+          <div class="aptitude-intro-text">
+            The following results are derived from your subject-wise marks and personality assessment.
+            Your dominant thinking style has been identified and incorporated directly into the stream compatibility analysis above.
           </div>
         </div>
-
-        <div class="personality-insight">
-          <strong>AI Insight:</strong> Your Analytical category score is the highest across all three dimensions, indicating a strong aptitude for structured reasoning, data interpretation, and methodical problem-solving. This cognitive profile aligns most closely with Science (PCM), where Physics and Mathematics demand precisely this thinking style — which is the primary reason Science received a 91% compatibility rating in your results above.
-        </div>
-
       </div>
+      <div class="aptitude-cols" id="aptitudeCols"></div>
     </div>
 
-    <!-- DISCLAIMER -->
-    <div class="disclaimer">
-      <span class="disc-icon">ⓘ</span>
-      This analysis has been generated by AI based on your academic marks, personality type, and AI chat history. It is a data-backed suggestion intended to guide your decision — the final choice of stream rests entirely with you and your family.
+    <!-- VIEW ROADMAP -->
+    <div class="results-footer">
+      <button class="view-roadmap-btn" onclick="window.location.href='result.html'">
+        View Final Career Roadmap 🚀
+      </button>
     </div>
-
   </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  &copy; 2025 PathFinder AI &nbsp;·&nbsp; Powered by Intelligent Stream Analysis
 </div>
 
 <script>
-  // ═══════════════════════════════════════════════════
-  // LOAD DATA FROM LOCALSTORAGE
-  // ═══════════════════════════════════════════════════
-  const marks = JSON.parse(localStorage.getItem("userMarks") || "{}");
-  const interests = JSON.parse(localStorage.getItem("interests") || "[]");
-  const scores = JSON.parse(localStorage.getItem("scores") || '{"analytical": 0, "logical": 0, "creative": 0}');
-  const topStream = localStorage.getItem("topStream") || "N/A";
+/* ─── DATA ─── */
+const subjects = [
+  { id: 'english', label: 'English',        default: 78 },
+  { id: 'hindi',   label: 'Hindi',          default: 90 },
+  { id: 'math',    label: 'Mathematics',    default: 45 },
+  { id: 'science', label: 'Science',        default: 45 },
+  { id: 'social',  label: 'Social Science', default: 78 },
+  { id: 'cs',      label: 'Computer Science', default: 67 },
+];
 
-  // ═══════════════════════════════════════════════════
-  // INITIALIZE UI
-  // ═══════════════════════════════════════════════════
-  window.onload = () => {
-    // 1. Calculate Average Score
-    const markValues = Object.values(marks).map(Number).filter(v => !isNaN(v));
-    const avg = markValues.length ? (markValues.reduce((a, b) => a + b, 0) / markValues.length).toFixed(1) : 0;
-    document.getElementById('avgScore').innerText = `${avg}%`;
+const personalityData = {
+  analytical: { icon: '🧠', title: 'Analytical Thinker', desc: 'Pattern recognition, structured problem-solving, quantitative reasoning.', apt: [{icon:'🔢',label:'Analytical',sub:'Dominant trait'},{icon:'🔍',label:'Logical',sub:'Secondary trait'},{icon:'🎨',label:'Creative',sub:'Tertiary trait'}] },
+  logical:    { icon: '🔍', title: 'Logical Thinker',    desc: 'Step-by-step reasoning, evidence-based decisions, systematic approach.', apt: [{icon:'🔍',label:'Logical',sub:'Dominant trait'},{icon:'🔢',label:'Analytical',sub:'Secondary trait'},{icon:'💡',label:'Intuitive',sub:'Tertiary trait'}] },
+  creative:   { icon: '🎨', title: 'Creative Thinker',   desc: 'Divergent thinking, originality, strong visual and abstract reasoning.', apt: [{icon:'🎨',label:'Creative',sub:'Dominant trait'},{icon:'💡',label:'Intuitive',sub:'Secondary trait'},{icon:'🔢',label:'Analytical',sub:'Tertiary trait'}] },
+  social:     { icon: '🤝', title: 'Social / Empathetic', desc: 'People-oriented, strong communication, collaborative problem-solving.', apt: [{icon:'🤝',label:'Social',sub:'Dominant trait'},{icon:'💡',label:'Intuitive',sub:'Secondary trait'},{icon:'🎨',label:'Creative',sub:'Tertiary trait'}] },
+};
 
-    // 2. Personality Type (Based on highest score)
-    let dominant = "Balanced";
-    const maxScore = Math.max(scores.analytical || 0, scores.logical || 0, scores.creative || 0, scores.aptitude || 0);
-    
-    if (scores.analytical === maxScore) dominant = "Analytical";
-    else if (scores.logical === maxScore) dominant = "Logical";
-    else if (scores.creative === maxScore) dominant = "Creative";
-    else if (scores.aptitude === maxScore) dominant = "Aptitude";
-    
-    document.getElementById('personalityType').innerText = dominant;
+/* ─── BUILD INPUTS ─── */
+const container = document.getElementById('subjectInputs');
+subjects.forEach(s => {
+  const row = document.createElement('div');
+  row.className = 'subject-row-input';
+  row.innerHTML = `
+    <span class="subject-name">${s.label}</span>
+    <div class="range-wrapper">
+      <input type="range" min="0" max="100" step="1" value="${s.default}" id="range_${s.id}" oninput="onSlider('${s.id}')">
+      <div class="range-fill-overlay" id="fill_${s.id}" style="width:${s.default}%"></div>
+    </div>
+    <span class="subject-pct" id="val_${s.id}">${s.default}%</span>
+  `;
+  container.appendChild(row);
+});
 
-    // 3. Interest Count
-    document.getElementById('interestCount').innerText = interests.length;
+function onSlider(id) {
+  const v = parseInt(document.getElementById('range_'+id).value);
+  document.getElementById('val_'+id).textContent = v + '%';
+  document.getElementById('fill_'+id).style.width = v + '%';
+  updateMetrics();
+}
 
-    // 4. Subject Bars
-    const marksCard = document.getElementById('marksCard');
-    const subjectNames = {
-      english: "English",
-      hindi: "Hindi",
-      maths: "Mathematics",
-      science: "Science",
-      social: "Social Science",
-      computer: "Computer Science"
-    };
+function getScores() {
+  const s = {};
+  subjects.forEach(sub => s[sub.id] = parseInt(document.getElementById('range_'+sub.id).value));
+  return s;
+}
 
-    Object.entries(marks).forEach(([key, val]) => {
-      const row = document.createElement('div');
-      row.className = 'bar-row';
-      row.innerHTML = `
-        <span class="bar-subj">${subjectNames[key] || key}</span>
-        <div class="bar-track"><div class="bar-fill" data-w="${val}"></div></div>
-        <span class="bar-num">${val}%</span>
-      `;
-      marksCard.appendChild(row);
-    });
+function updateMetrics() {
+  const s = getScores();
+  const avg = Math.round(Object.values(s).reduce((a,b)=>a+b,0) / subjects.length);
+  document.getElementById('metricAvg').textContent = avg + '%';
+}
 
-    // Trigger bar animations
-    setTimeout(() => {
-      document.querySelectorAll('.bar-fill').forEach(el => {
-        el.style.width = el.getAttribute('data-w') + '%';
-      });
-    }, 400);
+function updatePersonality() {
+  const val = document.getElementById('personalitySelect').value;
+  const d = personalityData[val];
+  document.getElementById('persIconBox').textContent = d.icon;
+  document.getElementById('persTitleText').textContent = d.title;
+  document.getElementById('persDescText').textContent = d.desc;
+  document.getElementById('metricPers').textContent = d.title.split(' ')[0];
+}
 
-    // 5. Personality Breakdown
-    const quizCards = document.querySelectorAll('.quiz-cat-card');
-    const categories = ['analytical', 'logical', 'creative']; // Mapping to the 3 available cards
-    
-    categories.forEach((cat, idx) => {
-      const score = scores[cat] || 0;
-      const card = quizCards[idx];
-      if (!card) return;
-      
-      const fill = card.querySelector('.quiz-cat-fill');
-      const scoreEl = card.querySelector('.quiz-cat-score');
-      
-      scoreEl.innerHTML = `${score}<span style="font-size:14px;color:var(--text-soft)">/10</span>`; // Quiz max is 10
-      fill.style.width = (score / 10 * 100) + '%';
-      
-      if (cat.toLowerCase() === dominant.toLowerCase()) {
-        card.classList.add('dominant');
-      } else {
-        card.classList.remove('dominant');
-      }
-    });
-  };
+/* ─── SCORING LOGIC ─── */
+function computeStreams(scores, personality) {
+  const { math: m, science: sc, cs, social: soc, english: eng, hindi: hi } = scores;
+  const streams = [];
 
-  // ═══════════════════════════════════════════════════
-  // ANALYSIS LOGIC
-  // ═══════════════════════════════════════════════════
-  function startAnalysis() {
-    const btn = document.getElementById('analyseBtn');
-    const box = document.getElementById('loadingBox');
-    btn.disabled = true;
-    btn.innerHTML = '&#9654;&nbsp; Analysis in Progress...';
-    box.classList.add('show');
+  /* PCM */
+  let pcmRaw = (m*0.45) + (sc*0.30) + (cs*0.20) + (eng*0.05);
+  if (m < 60) pcmRaw *= (m/60)*0.65;
+  if (sc < 60) pcmRaw *= (sc/60)*0.75;
+  if (personality === 'analytical' || personality === 'logical') pcmRaw *= 1.05;
+  if (personality === 'creative' || personality === 'social') pcmRaw *= 0.90;
+  const pcmScore = Math.min(Math.round(pcmRaw), 97);
 
-    let i = 0;
-    const tick = setInterval(() => {
-      if (i > 0) {
-        const prev = document.getElementById('ls' + (i - 1));
-        if (prev) { prev.classList.remove('active'); prev.classList.add('done'); }
-      }
-      const cur = document.getElementById('ls' + i);
-      if (cur) cur.classList.add('active');
-      i++;
-      
-      if (i >= 7) {
-        clearInterval(tick);
-        setTimeout(() => {
-          generateRecommendations();
-          box.classList.remove('show');
-          btn.innerHTML = '&#10003;&nbsp; Analysis Complete';
-          const results = document.getElementById('results');
-          results.classList.add('show');
-          setTimeout(() => {
-            document.querySelectorAll('.compat-fill').forEach(el => {
-              el.style.width = el.getAttribute('data-w') + '%';
-            });
-          }, 300);
-          results.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 600);
-      }
-    }, 600);
-  }
+  const pcmCareers = (m>=60 && sc>=60) ? ['Software Engineer','Data Scientist','Mechanical Eng.','Research Analyst']
+                   : cs>=65 ? ['Web Developer','IT Support','BCA','Diploma IT']
+                   : ['Liberal Arts+Tech','Certificate Courses','BCA'];
 
-  function generateRecommendations() {
-    // Simple logic for recommendation
-    const maths = Number(marks.maths || 0);
-    const science = Number(marks.science || 0);
-    const computer = Number(marks.computer || 0);
-    const social = Number(marks.social || 0);
-    const english = Number(marks.english || 0);
-    const hindi = Number(marks.hindi || 0);
-    
-    const pcmScore = (maths * 0.4 + science * 0.4 + computer * 0.2);
-    const pcbScore = (science * 0.6 + english * 0.2 + social * 0.2);
-    const commerceScore = (maths * 0.3 + social * 0.3 + english * 0.4);
-    const artsScore = (social * 0.5 + english * 0.5);
+  let pcmReason;
+  if (m>=75 && sc>=75) pcmReason = `Your Mathematics (${m}%) and Science (${sc}%) both reflect strong quantitative and logical aptitude. Combined with your ${personalityData[personality].title} profile, PCM aligns strongly with your academic strengths.`;
+  else if (m>=60 && sc>=60) pcmReason = `Your Math (${m}%) and Science (${sc}%) scores are adequate for PCM. With consistent effort you can perform well, though competition in JEE/NEET entrance exams will be moderate.`;
+  else if (m<60 && sc>=60) pcmReason = `Your Science score (${sc}%) is reasonable, but Mathematics (${m}%) is below the recommended threshold. PCM in Class 11–12 is heavily Math-dependent — significant improvement is needed before choosing this stream.`;
+  else if (sc<60 && m>=60) pcmReason = `Your Mathematics (${m}%) is reasonable, but Science (${sc}%) is below the recommended level. Physics and Chemistry become very demanding in senior classes. Commerce or a CS-focused path may suit you better.`;
+  else pcmReason = `Both Mathematics (${m}%) and Science (${sc}%) are below the recommended 60% threshold for PCM. Opting for this stream without foundational improvement would make Class 11–12 very difficult. Commerce or Humanities are stronger options for your current profile.`;
 
-    // Determine Top Stream
-    let bestStream = "Science (PCM)";
-    let maxVal = pcmScore;
-    
-    if (pcbScore > maxVal) { maxVal = pcbScore; bestStream = "Science (PCB)"; }
-    if (commerceScore > maxVal) { maxVal = commerceScore; bestStream = "Commerce"; }
-    if (artsScore > maxVal) { maxVal = artsScore; bestStream = "Arts"; }
+  streams.push({ name:'Science (PCM)', score:pcmScore, careers:pcmCareers, reason:pcmReason, salary:{start:'₹4–8 LPA',mid:'₹12–25 LPA',senior:'₹30–60 LPA'} });
 
-    localStorage.setItem("topStream", bestStream);
+  /* PCB */
+  let pcbRaw = (sc*0.50) + (eng*0.20) + (m*0.15) + (hi*0.15);
+  if (sc<55) pcbRaw *= 0.72;
+  if (personality==='social' || personality==='logical') pcbRaw *= 1.04;
+  const pcbScore = Math.min(Math.round(pcbRaw), 95);
 
-    // Update UI for Top Pick
-    const topPickName = document.querySelector('.stream-card.top-pick .stream-name');
-    const topPickReason = document.querySelector('.stream-card.top-pick .ai-reason');
-    
-    topPickName.innerText = bestStream;
-    
-    const topSubject = maths >= science && maths >= computer ? "Mathematics" : (science >= computer ? "Science" : "Computer Science");
-    const topMark = Math.max(maths, science, computer);
-    
-    topPickReason.innerText = `Based on your high score of ${topMark}% in ${topSubject} and your ${interests.length} selected interests (including ${interests.slice(0,2).join(', ')}), ${bestStream} is your strongest match. Your personality profile also shows strength in logical reasoning which is essential for this path.`;
-  }
+  const pcbReason = sc>=70 ? `Your Science score (${sc}%) shows strong potential for biological sciences. This stream is ideal if you are interested in medicine, pharmacy, or life sciences.`
+                  : sc>=55 ? `Your Science score (${sc}%) is moderate. PCB is viable but Biology and Chemistry will require extra focus to compete at the NEET entrance level.`
+                  : `Your Science score (${sc}%) is below the comfortable level for PCB. Consider improving it before committing, or explore Commerce and Humanities as better-aligned alternatives.`;
+
+  streams.push({ name:'Science (PCB)', score:pcbScore, careers:['MBBS / Doctor','Pharmacist','Biotechnologist','Nursing'], reason:pcbReason, salary:{start:'₹3–7 LPA',mid:'₹10–20 LPA',senior:'₹25–60 LPA'} });
+
+  /* Commerce */
+  let commRaw = (soc*0.30) + (eng*0.25) + (m*0.25) + (hi*0.10) + (cs*0.10);
+  if (personality==='analytical') commRaw *= 1.04;
+  if (personality==='social') commRaw *= 1.05;
+  const commScore = Math.min(Math.round(commRaw), 95);
+
+  const commReason = m>=60 ? `Your Mathematics (${m}%) transfers well to Commerce through Accountancy and Economics. Your Social Science score (${soc}%) further strengthens this match.`
+                   : `Your Social Science (${soc}%) and English (${eng}%) scores make Commerce a well-suited option. Math-heavy subjects like Accountancy will need attention, but Applied Math tracks ease that pressure.`;
+
+  streams.push({ name:'Commerce', score:commScore, careers:['CA / CFA','MBA','Financial Analyst','Business Analyst'], reason:commReason, salary:{start:'₹3–6 LPA',mid:'₹10–18 LPA',senior:'₹20–45 LPA'} });
+
+  /* Humanities */
+  let humRaw = (soc*0.35) + (eng*0.30) + (hi*0.20) + (m*0.05) + (sc*0.10);
+  if (personality==='creative' || personality==='social') humRaw *= 1.07;
+  if (personality==='analytical' || personality==='logical') humRaw *= 0.92;
+  const humScore = Math.min(Math.round(humRaw), 95);
+
+  const humReason = (soc>=70||eng>=70) ? `Your Social Science (${soc}%) and English (${eng}%) are genuine strengths that align perfectly with Humanities. Civil services, journalism, law, and teaching are strong career pathways.`
+                  : `Humanities offers a broad, flexible curriculum. Your language and social science scores show a reasonable fit — especially if technical streams feel misaligned with your interests.`;
+
+  streams.push({ name:'Humanities / Arts', score:humScore, careers:['Civil Services (IAS/IPS)','Journalist','Lawyer','Teacher/Professor'], reason:humReason, salary:{start:'₹2–5 LPA',mid:'₹8–15 LPA',senior:'₹15–40 LPA'} });
+
+  streams.sort((a,b) => b.score - a.score);
+  return streams;
+}
+
+/* ─── RENDER ─── */
+const badgeLabels = ['Best Match','Second Match','Third Match','Fourth Match'];
+const badgeClasses = ['badge-best','badge-second','badge-third','badge-fourth'];
+
+function runAnalysis() {
+  const scores = getScores();
+  const personality = document.getElementById('personalitySelect').value;
+  const streams = computeStreams(scores, personality);
+
+  const cardsEl = document.getElementById('streamCards');
+  cardsEl.innerHTML = '';
+
+  streams.forEach((s, i) => {
+    const card = document.createElement('div');
+    card.className = 'stream-card' + (i===0 ? ' best-match' : '');
+    card.innerHTML = `
+      <div class="stream-header">
+        <div class="stream-name">${s.name}</div>
+        <div class="match-badge ${badgeClasses[i]}">${badgeLabels[i]}</div>
+      </div>
+      <div class="match-pct-row">
+        <div style="font-size:12px;color:var(--text-muted);">Match score</div>
+        <div class="match-pct-num">${s.score}%</div>
+      </div>
+      <div class="match-bar-track">
+        <div class="match-bar-fill" style="width:0%" id="mbar_${i}"></div>
+      </div>
+      <div class="reason-box"><p>${s.reason}</p></div>
+      <div class="info-grid">
+        <div class="info-box">
+          <div class="info-box-label">Top Career Paths</div>
+          <div class="career-tags">${s.careers.map(c=>`<span class="career-tag">${c}</span>`).join('')}</div>
+        </div>
+        <div class="info-box">
+          <div class="info-box-label">Salary Projections</div>
+          <div class="salary-cols">
+            <div class="sal-col"><div class="sal-stage">Starting</div><div class="sal-amt">${s.salary.start}</div></div>
+            <div class="sal-col"><div class="sal-stage">Mid-career</div><div class="sal-amt">${s.salary.mid}</div></div>
+            <div class="sal-col"><div class="sal-stage">Senior</div><div class="sal-amt">${s.salary.senior}</div></div>
+          </div>
+        </div>
+      </div>
+    `;
+    cardsEl.appendChild(card);
+    setTimeout(() => { document.getElementById('mbar_'+i).style.width = s.score+'%'; }, 100 + i*150);
+  });
+
+  /* Aptitude section */
+  const pd = personalityData[personality];
+  document.getElementById('aptIconBox').textContent = pd.icon;
+  document.getElementById('aptTitle').textContent = pd.title;
+
+  const aptCols = document.getElementById('aptitudeCols');
+  aptCols.innerHTML = '';
+  const aptScores = [1, 2, 2]; // rank values shown under icons
+  pd.apt.forEach((a, idx) => {
+    const col = document.createElement('div');
+    col.className = 'apt-col';
+    col.innerHTML = `
+      <div class="apt-icon">${a.icon}</div>
+      <div class="apt-label">${a.label}</div>
+      <div class="apt-score">${aptScores[idx]}</div>
+      <div class="apt-sub">${a.sub}</div>
+    `;
+    aptCols.appendChild(col);
+  });
+
+  document.getElementById('resultsSection').classList.add('visible');
+  document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* Init */
+updateMetrics();
 </script>
-<!-- Code injected by live-server -->
-<script>
-	// <![CDATA[  <-- For SVG support
-	if ('WebSocket' in window) {
-		(function () {
-			function refreshCSS() {
-				var sheets = [].slice.call(document.getElementsByTagName("link"));
-				var head = document.getElementsByTagName("head")[0];
-				for (var i = 0; i < sheets.length; ++i) {
-					var elem = sheets[i];
-					var parent = elem.parentElement || head;
-					parent.removeChild(elem);
-					var rel = elem.rel;
-					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
-						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
-						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
-					}
-					parent.appendChild(elem);
-				}
-			}
-			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
-			var address = protocol + window.location.host + window.location.pathname + '/ws';
-			var socket = new WebSocket(address);
-			socket.onmessage = function (msg) {
-				if (msg.data == 'reload') window.location.reload();
-				else if (msg.data == 'refreshcss') refreshCSS();
-			};
-			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
-				console.log('Live reload enabled.');
-				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
-			}
-		})();
-	}
-	else {
-		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
-	}
-	// ]]>
-</script>
-
-
-</body></html>
+</body>
+</html>
